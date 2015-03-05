@@ -8,8 +8,10 @@ using System.Windows.Input;
 
 namespace EstrattoContoOCR
 {
-    interface ISelectionAreaDelegate
+    public interface ISelectionAreaDelegate
     {
+
+        void OCRAreaAnalysis(SelectionArea area);
 
         //void SelectionArea_MouseEnter(object sender, MouseEventArgs e);
         //void SelectionArea_MouseLeave(object sender, MouseEventArgs e);

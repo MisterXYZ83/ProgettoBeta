@@ -13,7 +13,7 @@ using Tesseract;
 namespace EstrattoContoOCR
 {
 
-    class RecognizedArea
+    public class RecognizedArea
     {
 
         private Tesseract.Rect mAreaRect;
