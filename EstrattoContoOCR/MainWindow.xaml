@@ -11,7 +11,6 @@
         <Menu Name="mMainMenu" HorizontalAlignment="Left" Height="22" VerticalAlignment="Top" Width="399">
             <MenuItem Header="_Crea">
                 <MenuItem Header="_File" Click="FileMenuItem_Click"></MenuItem>
-                <MenuItem Header="_Scanner" Click="ScannerMenuItem_Click"></MenuItem>
                 <Separator />
                 <MenuItem Header="_Esci" Click="ExitMenuItem_Click"></MenuItem>
             </MenuItem>

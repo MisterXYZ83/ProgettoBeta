@@ -43,6 +43,8 @@ namespace EstrattoContoOCR
 
         private List<RecognizedArea> mRecognizedAreas;
 
+        private List<RecognizedArea> mDeletedAreas;
+
         private bool mRecognizedAreasVisible;
 
         private Canvas mParentCanvas;
@@ -131,7 +133,8 @@ namespace EstrattoContoOCR
             c.ContextMenuOpening += c_ContextMenuOpening;
 
             mRecognizedAreas = new List<RecognizedArea>();
-            
+            mDeletedAreas = new List<RecognizedArea>();
+
             HideArea();
 
         }
@@ -175,7 +178,39 @@ namespace EstrattoContoOCR
 
                 mContextMenu.Items.Add(mShowReconAreas);
             }
+
+            //mostro l'annulla rimozione
+
+            if ( mDeletedAreas != null && mDeletedAreas.Count() > 0 )
+            {
+                MenuItem undoArea = new MenuItem();
+
+                undoArea.Header = "Ripristina ultima area";
+                undoArea.Click += undoArea_Click;
+
+                mContextMenu.Items.Add(new Separator());
+                mContextMenu.Items.Add(undoArea);
+            }
            
+        }
+
+        void undoArea_Click(object sender, RoutedEventArgs e)
+        {
+            //estraggo l'ultima dalla lista e riattivo
+            if ( mDeletedAreas != null && mDeletedAreas.Count() > 0 )
+            {
+                int n = mDeletedAreas.Count();
+                
+                RecognizedArea last = mDeletedAreas[n - 1];
+
+                last.Active = true;
+
+                last.SelectStateArea(false);
+
+                last.AddAreaInCanvas(mParentCanvas);
+
+                mDeletedAreas.Remove(last);
+            }
         }
 
         void mShowReconAreas_Click(object sender, RoutedEventArgs e)
@@ -227,6 +262,17 @@ namespace EstrattoContoOCR
                 RemoveSelectionFromCanvas();
             }
          
+        }
+
+        public void SetAreaAsInactive(RecognizedArea area)
+        {
+            if ( area != null )
+            {
+                //aggiungo tra i cancellati
+                mDeletedAreas.Add(area);
+                //rendo invisibiles
+                area.RemoveAreaFromCanvas();
+            }
         }
 
         public void HideArea ()
@@ -514,34 +560,34 @@ namespace EstrattoContoOCR
             switch ( mAreaType )
             {
                 case SelectionAreaType.DareArea:
-                    {
-                        parms[0] = "DARE";
-                    }
-                    break;
+                {
+                    parms[0] = "DARE";
+                }
+                break;
 
                 case SelectionAreaType.AvereArea:
-                    {
-                        parms[0] = "AVERE";
-                    }
-                    break;
+                {
+                    parms[0] = "AVERE";
+                }
+                break;
 
                 case SelectionAreaType.DataOperazioneArea:
-                    {
-                        parms[0] = "D.OPERAZ.";
-                    }
-                    break;
+                {
+                    parms[0] = "D.OPERAZ.";
+                }
+                break;
 
                 case SelectionAreaType.DataValutaArea:
-                    {
-                        parms[0] = "D.VAL.";
-                    }
-                    break;
+                {
+                    parms[0] = "D.VAL.";
+                }
+                break;
 
                 case SelectionAreaType.DescrizioneArea:
-                    {
-                        parms[0] = "DESCR";
-                    }
-                    break;
+                {
+                    parms[0] = "DESCR";
+                }
+                break;
             }
 
             mAreaInfos.Text = String.Format("Area: {0} - L:{1:0} T:{2:0} | W:{3:0} H:{4:0}", parms);

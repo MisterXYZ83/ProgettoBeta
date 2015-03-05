@@ -53,6 +53,9 @@ namespace EstrattoContoOCR
         //private Pix mAnalyzableImage;
         private System.Drawing.Bitmap mAnalyzableImage;
 
+        private bool mReady;
+
+
         public OCRWindow()
         {
             InitializeComponent();
@@ -102,6 +105,13 @@ namespace EstrattoContoOCR
             this.Closing += OCRWindow_Closing;
         }
 
+        public bool OCRWindowReady
+        {
+            get
+            {
+                return mReady;
+            }
+        }
 
         private void ClearSelectionAreas()
         {
@@ -139,8 +149,20 @@ namespace EstrattoContoOCR
         }
 
 
-        public void SetImagePath( string img_path )
+        public bool SetImagePath( string img_path )
         {
+
+            if (mReady)
+            {
+                MessageBoxResult r1 = MessageBox.Show("Desideri passare ad una nuova immagine?", "Conferma", MessageBoxButton.YesNo);
+
+                if (r1 == MessageBoxResult.No)
+                {
+                    return false;
+                }
+            }
+
+
             //pulizia
             if (mImage != null)
             {
@@ -190,11 +212,25 @@ namespace EstrattoContoOCR
 
                 System.Drawing.Bitmap orig = new System.Drawing.Bitmap(ms_o);
 
-                mAnalyzableImage = orig.MedianFilter(3, 0, true);
+                MessageBoxResult r2 = MessageBox.Show("Desideri applicare la pulitura (può richiedere tempo)?", "Conferma", MessageBoxButton.YesNo);
 
-                ms_o.Dispose();
-                orig.Dispose();
-                tmp_img.Dispose();
+                if ( r2 == MessageBoxResult.Yes )
+                {
+                    WaitDialogBox dbox = new WaitDialogBox();
+                    dbox.Owner = (Window)this.Parent;
+                    dbox.ShowDialog();
+
+                    mAnalyzableImage = orig.MedianFilter(3, 0, true);
+
+                    dbox.Close();
+
+                    ms_o.Dispose();
+                }
+                else
+                {
+                    //senza filtro
+                    mAnalyzableImage = new System.Drawing.Bitmap(ms_o);
+                }
 
                 //creo immagine anteprima
                 MemoryStream ms = new MemoryStream();
@@ -205,6 +241,9 @@ namespace EstrattoContoOCR
                 mImage.BeginInit();
                 mImage.StreamSource = ms;
                 mImage.EndInit();
+
+                orig.Dispose();
+                tmp_img.Dispose();
 
                 //mAnalyzableImage = Pix.LoadFromFile(mImagePath);
                 //mAnalyzableImage = new System.Drawing.Bitmap(ms);
@@ -221,7 +260,24 @@ namespace EstrattoContoOCR
 
                 System.Drawing.Bitmap orig = new System.Drawing.Bitmap(mImagePath);
                 
-                mAnalyzableImage = orig.MedianFilter(3, 0, true);
+                MessageBoxResult r2 = MessageBox.Show("Desideri applicare la pulitura (può richiedere tempo)?", "Conferma", MessageBoxButton.YesNo);
+
+                if (r2 == MessageBoxResult.Yes)
+                {
+                    WaitDialogBox dbox = new WaitDialogBox();
+                    dbox.Owner = (Window)this.Parent;
+                    dbox.Show();
+
+                   
+                    mAnalyzableImage = orig.MedianFilter(3, 0, true);
+                   
+                    
+
+                    dbox.Close();
+                    
+                    orig.Dispose();
+
+                }
 
                 MemoryStream ms = new MemoryStream();
 
@@ -232,7 +288,7 @@ namespace EstrattoContoOCR
                 mImage.StreamSource = ms;
                 mImage.EndInit();
 
-                orig.Dispose();
+                
             }
 
             ImageBrush brush = new ImageBrush();
@@ -247,6 +303,10 @@ namespace EstrattoContoOCR
             mImageCanvas.Height = mImage.PixelHeight;
 
             //mAnalyzableImage = new System.Drawing.Bitmap();
+
+            mReady = true;
+
+            return true;
         }
 
         private void ScannerMenuItem_Click(object sender, RoutedEventArgs e)
@@ -611,7 +671,6 @@ namespace EstrattoContoOCR
             }*/
 
         }
-
         public void SelectionArea_MouseLeave(object sender, MouseEventArgs e)
         {
             /*Rectangle r = sender as Rectangle;
@@ -625,8 +684,6 @@ namespace EstrattoContoOCR
             //area.SetStretching(false, pt);
             //area.ResetTransformPoint();
         }
-
-
         public void ShowHideAreaMenu_Click (object sender, EventArgs args)
         {
             /*MenuItem item = sender as MenuItem;
@@ -712,6 +769,11 @@ namespace EstrattoContoOCR
                 iter.TryGetBoundingBox(PageIteratorLevel.TextLine, out word_rect);
 
                 string str_out = iter.GetText(PageIteratorLevel.TextLine);
+
+                if ( area.AreaType != SelectionAreaType.DescrizioneArea )
+                {
+                    str_out = str_out.Trim().Replace(" ", string.Empty);
+                }
 
                 float conf = iter.GetConfidence(PageIteratorLevel.TextLine);
 

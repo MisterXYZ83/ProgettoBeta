@@ -54,20 +54,18 @@ namespace EstrattoContoOCR
                 // Open document 
                 mFilePath = dlg.FileName;
 
-                mOcrWindow.SetImagePath(mFilePath);
-
-                mStatusBarMessage.Text = mFilePath + " selezionato";
+                bool ret = mOcrWindow.SetImagePath(mFilePath);
+                
+                if ( ret )
+                {
+                    mStatusBarMessage.Text = mFilePath + " selezionato";
+                }
+                else
+                {
+                    mFilePath = null;
+                }
+                
             }
-        }
-
-        private void ScannerMenuItem_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void ProvaMenuItem_Click(object sender, RoutedEventArgs e)
-        {
-            
         }
 
 
@@ -79,8 +77,10 @@ namespace EstrattoContoOCR
 
         private void ElaboraMenuItem_Click(object sender, RoutedEventArgs e)
         {
-        
-            mOcrWindow.Show();
+            if ( mOcrWindow.OCRWindowReady )
+            {
+                mOcrWindow.Show();
+            }
         }
 
         private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)

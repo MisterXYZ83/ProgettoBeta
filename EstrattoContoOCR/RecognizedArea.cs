@@ -30,6 +30,21 @@ namespace EstrattoContoOCR
         private SolidColorBrush mSelectedColorFill;
         private SolidColorBrush mUnselectedColorFill;
 
+        private Boolean mActive;
+
+        public Boolean Active
+        {
+            get
+            {
+                return mActive;
+            }
+
+            set
+            {
+                mActive = value;
+            }
+        }
+
         public Tesseract.Rect AreaRect
         {
             get { return mAreaRect; }
@@ -69,12 +84,14 @@ namespace EstrattoContoOCR
             mShapeArea.ContextMenuOpening += OptionsMenuOpening;
             mShapeArea.ContextMenuClosing += OptionsMenuClosing;
 
+            mActive = true;
+
         }
 
         private void OptionsMenuOpening (object sender, ContextMenuEventArgs e)
         {
 
-            mShapeArea.Fill = mSelectedColorFill;
+            SelectStateArea(true);
 
             mOptionsMenu.Items.Clear();
 
@@ -106,15 +123,32 @@ namespace EstrattoContoOCR
             //elimino
             if ( mParentArea != null)
             {
-                mParentArea.RemoveArea(this);
+                //mParentArea.RemoveArea(this);
 
-                RemoveAreaFromCanvas();
+                //RemoveAreaFromCanvas();
+
+                mActive = false;
+
+                mParentArea.SetAreaAsInactive(this);
+
+            }
+        }
+
+        public void SelectStateArea (bool val)
+        {
+            if ( !val )
+            {
+                mShapeArea.Fill = mUnselectedColorFill;
+            }
+            else
+            {
+                mShapeArea.Fill = mSelectedColorFill;
             }
         }
 
         private void OptionsMenuClosing(object sender, ContextMenuEventArgs e)
         {
-            mShapeArea.Fill = mUnselectedColorFill;
+            SelectStateArea(false);
         }
 
         public void AddAreaInCanvas ( Canvas canvas )

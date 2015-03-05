@@ -92,6 +92,9 @@
     </Compile>
     <Compile Include="RecognizedArea.cs" />
     <Compile Include="SelectionArea.cs" />
+    <Compile Include="WaitDialogBox.xaml.cs">
+      <DependentUpon>WaitDialogBox.xaml</DependentUpon>
+    </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -107,6 +110,10 @@
     <Page Include="OCRWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="WaitDialogBox.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
   <ItemGroup>
