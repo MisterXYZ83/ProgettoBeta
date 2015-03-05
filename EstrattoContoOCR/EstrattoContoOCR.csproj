@@ -91,7 +91,7 @@
       <DependentUpon>OCRWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="RecognizedArea.cs" />
-    <Compile Include="x64\SelectionArea.cs" />
+    <Compile Include="SelectionArea.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

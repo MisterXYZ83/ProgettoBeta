@@ -34,11 +34,17 @@ namespace EstrattoContoOCR
         private String mImagePath;
         private ContextMenu mOptionsMenu;
 
-        private SelectionArea mDataOperazioneArea;
+        /*private SelectionArea mDataOperazioneArea;
         private SelectionArea mDataValutaArea;
         private SelectionArea mDareArea;
         private SelectionArea mAvereArea;
-        private SelectionArea mDescrizioneArea;
+        private SelectionArea mDescrizioneArea;*/
+
+        private List<SelectionArea> mDataOperazioneAreas;
+        private List<SelectionArea> mDataValutaAreas;
+        private List<SelectionArea> mDareAreaAreas;
+        private List<SelectionArea> mAvereAreaAreas;
+        private List<SelectionArea> mDescrizioneAreas;
 
 
         private SelectionArea mDraggingArea;
@@ -57,7 +63,7 @@ namespace EstrattoContoOCR
             mImageCanvas.ContextMenu = mOptionsMenu;
             mImageCanvas.ContextMenuOpening += mImageCanvas_ContextMenuOpening;
 
-            mDataOperazioneArea = new SelectionArea(50, 50, 100, 100, SelectionAreaType.DataOperazioneArea, this);
+            /*mDataOperazioneArea = new SelectionArea(50, 50, 100, 100, SelectionAreaType.DataOperazioneArea, this);
             mDataValutaArea = new SelectionArea(50, 50, 100, 100, SelectionAreaType.DataValutaArea, this);
             mDareArea = new SelectionArea(50, 50, 100, 100, SelectionAreaType.DareArea, this);
             mAvereArea = new SelectionArea(50, 50, 100, 100, SelectionAreaType.AvereArea, this);
@@ -67,7 +73,13 @@ namespace EstrattoContoOCR
             mDataOperazioneArea.AddToCanvas(mImageCanvas);
             mDareArea.AddToCanvas(mImageCanvas);
             mAvereArea.AddToCanvas(mImageCanvas);
-            mDescrizioneArea.AddToCanvas(mImageCanvas);
+            mDescrizioneArea.AddToCanvas(mImageCanvas);*/
+
+            mDataOperazioneAreas = new List<SelectionArea>();
+            mDataValutaAreas = new List<SelectionArea>();
+            mDareAreaAreas = new List<SelectionArea>();
+            mAvereAreaAreas = new List<SelectionArea>();
+            mDescrizioneAreas = new List<SelectionArea>();
 
             mImageCanvas.MouseDown += SelectionArea_MouseLeftButtonDown;
             mImageCanvas.MouseUp += SelectionArea_MouseLeftButtonUp;
@@ -90,6 +102,43 @@ namespace EstrattoContoOCR
             this.Closing += OCRWindow_Closing;
         }
 
+
+        private void ClearSelectionAreas()
+        {
+            foreach ( SelectionArea area in mDataOperazioneAreas )
+            {
+                area.ClearRecognizedArea();
+            }
+
+            foreach ( SelectionArea area in mDataValutaAreas )
+            {
+                area.ClearRecognizedArea();
+            }
+
+            foreach ( SelectionArea area in mDareAreaAreas )
+            {
+                area.ClearRecognizedArea();
+            }
+
+            foreach ( SelectionArea area in mAvereAreaAreas )
+            {
+                area.ClearRecognizedArea();
+            }
+
+            foreach ( SelectionArea area in mDescrizioneAreas )
+            {
+                area.ClearRecognizedArea();
+            }
+
+            mDataOperazioneAreas.Clear();
+            mDataValutaAreas.Clear();
+            mDareAreaAreas.Clear();
+            mAvereAreaAreas.Clear();
+            mDescrizioneAreas.Clear();
+
+        }
+
+
         public void SetImagePath( string img_path )
         {
             //pulizia
@@ -107,11 +156,13 @@ namespace EstrattoContoOCR
 
             //svuoto le selection areas
 
-            mDataOperazioneArea.ClearRecognizedArea();
+            ClearSelectionAreas();
+
+            /*mDataOperazioneArea.ClearRecognizedArea();
             mDataValutaArea.ClearRecognizedArea();
             mDareArea.ClearRecognizedArea();
             mAvereArea.ClearRecognizedArea();
-            mDescrizioneArea.ClearRecognizedArea();
+            mDescrizioneArea.ClearRecognizedArea();*/
 
             //////
             mImagePath = img_path;
@@ -204,7 +255,7 @@ namespace EstrattoContoOCR
         }
 
         private void Elabora_Click(object sender, RoutedEventArgs e)
-        {
+        {/*
             if ( !mDataOperazioneArea.HasRecognizedData &&
                  !mDataValutaArea.HasRecognizedData && 
                  !mDareArea.HasRecognizedData && !mAvereArea.HasRecognizedData )
@@ -281,33 +332,7 @@ namespace EstrattoContoOCR
                 }
             }
 
-            //data dare
-            /*if (mDareArea.HasRecognizedData)
-            {
-                List<string> results = mDareArea.GetResults();
-
-                int row = 1;
-
-                foreach (string rs in results)
-                {
-                    ws.Cells[row + 1, 3].Value = rs;
-                    row++;
-                }
-            }
-
-            //data avere
-            if (mAvereArea.HasRecognizedData)
-            {
-                List<string> results = mAvereArea.GetResults();
-
-                int row = 1;
-
-                foreach (string rs in results)
-                {
-                    ws.Cells[row + 1, 4].Value = rs;
-                    row++;
-                }
-            }*/
+            
 
             //DARE / AVERE
             //inserisco in base alle coordinate delle aree
@@ -383,7 +408,7 @@ namespace EstrattoContoOCR
                 }
             }
 
-            pck.Save();
+            pck.Save();*/
         }
           
         private void OCRWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -401,10 +426,10 @@ namespace EstrattoContoOCR
 
         private void mImageCanvas_ContextMenuOpening(object sender, ContextMenuEventArgs e)
         {
-            RefreshOptionsMenu();
+            RefreshOptionsMenu(e);
         }
 
-        private void RefreshOptionsMenu ()
+        private void RefreshOptionsMenu (ContextMenuEventArgs e)
         {
 
             mOptionsMenu.Items.Clear();
@@ -417,13 +442,13 @@ namespace EstrattoContoOCR
             titles[3] = "Area AVERE";
             titles[4] = "Area DESCRIZIONE";
 
-            SelectionArea[] areas = new SelectionArea[5];
+            /*SelectionArea[] areas = new SelectionArea[5];
 
             areas[0] = mDataOperazioneArea;
             areas[1] = mDataValutaArea;
             areas[2] = mDareArea;
             areas[3] = mAvereArea;
-            areas[4] = mDescrizioneArea;
+            areas[4] = mDescrizioneArea;*/
 
             Separator sep = null;
             
@@ -435,19 +460,22 @@ namespace EstrattoContoOCR
             mOptionsMenu.Items.Add(mTitle);
             mOptionsMenu.Items.Add(sep);
 
-            for ( int k = 0 ; k < 5 ; k++ )
+            for ( int areaIdx = 0 ; areaIdx < 5 ; areaIdx++ )
             {
+                int k = areaIdx;
 
-                SelectionArea area = areas[k];
+                //SelectionArea area = areas[k];
                 String title = titles[k];
 
                 MenuItem mitem = new MenuItem();
 
                 mitem.Header = title;
 
-                MenuItem mShowHideItem = new MenuItem();
+                MenuItem mAddArea = new MenuItem();
 
-                if ( area.AreaVisibility() )
+                //intercetto se il click \'e su un'area
+
+                /*if ( area.AreaVisibility() )
                 {
                     //area visibile
                     mShowHideItem.Header = "Elimina Area";
@@ -484,16 +512,82 @@ namespace EstrattoContoOCR
                 {
                     //area invisibile
                     mShowHideItem.Header = "Inserisci Area";
+                    
+                    //SelectionArea area = new SelectionArea(e.CursorTop, e.CursorLeft, 100, 100, (SelectionAreaType)areaIdx, this);
+                    //area.AddToCanvas(mImageCanvas);
+
                     mShowHideItem.Tag = area;
                     mShowHideItem.Click += ShowHideAreaMenu_Click;
+                }*/
+
+                mAddArea.Header = "Inserisci Area";
+                SelectionAreaType area_type = (SelectionAreaType)areaIdx;
+
+                mAddArea.Tag = area_type;
+                mAddArea.Click += mAddAreaMenu_Click;
+
+                mitem.Items.Add(mAddArea);
+
+                //mOptionsMenu.Items.Add(mitem);
+
+                List<SelectionArea> list = null;
+                
+                switch(area_type)
+                {
+                    case SelectionAreaType.DataOperazioneArea:
+                        list = mDataOperazioneAreas;
+                        break;
+                    case SelectionAreaType.DataValutaArea:
+                        list = mDataValutaAreas;
+                        break;
+                    case SelectionAreaType.DareArea:
+                        list = mDareAreaAreas;
+                        break;
+                    case SelectionAreaType.AvereArea:
+                        list = mAvereAreaAreas;
+                        break;
+                    case SelectionAreaType.DescrizioneArea:
+                        list = mDescrizioneAreas;
+                        break;
                 }
 
+                if ( list.Count() > 0 )
+                {
+                    sep = new Separator();
 
-                mitem.Items.Add(mShowHideItem);
+                    mitem.Items.Add(sep);
+
+                    MenuItem showHideMenuItem = new MenuItem();
+
+                    showHideMenuItem.Header = "Mostra Aree";
+
+                    showHideMenuItem.Click += showMenuItem_Click;
+
+                    showHideMenuItem.Tag = list;
+
+                    mitem.Items.Add(showHideMenuItem);
+                }
+
 
                 mOptionsMenu.Items.Add(mitem);
             }
             
+        }
+
+        void showMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            //mostro/nascondo
+            MenuItem item = sender as MenuItem;
+
+            List<SelectionArea> areas = item.Tag as List<SelectionArea>;
+    
+            foreach ( SelectionArea area in areas )
+            {
+                if ( !area.AreaVisibility() )
+                {
+                    area.ShowArea();
+                }
+            }
         }
 
 
@@ -535,9 +629,17 @@ namespace EstrattoContoOCR
 
         public void ShowHideAreaMenu_Click (object sender, EventArgs args)
         {
-            MenuItem item = sender as MenuItem;
+            /*MenuItem item = sender as MenuItem;
 
-            SelectionArea area = item.Tag as SelectionArea;
+            SelectionAreaType type = (SelectionAreaType)item.Tag;
+            
+            Point pt = Mouse.GetPosition(mImageCanvas);
+
+            SelectionArea area = new SelectionArea(pt.X, pt.Y, 100, 100, type, this);
+            area.AddToCanvas(mImageCanvas);*/
+
+
+            /*SelectionArea area = item.Tag as SelectionArea;
     
             if ( area.AreaVisibility() )
             {
@@ -552,17 +654,14 @@ namespace EstrattoContoOCR
                 area.RefreshArea(pt.X, pt.Y, 200, 200);
                 area.ShowArea();
 
-            }
+            }*/
 
         }
 
 
-        public void AnalizeAreaMenu_Click (object sender, EventArgs args)
+        public void OCRAreaAnalysis (SelectionArea area)
         {
-            MenuItem item = sender as MenuItem;
-
-            SelectionArea area = item.Tag as SelectionArea;
-
+           
             if ( area.AreaVisibility() )
             {
                 //analisi OCR
@@ -585,7 +684,7 @@ namespace EstrattoContoOCR
 
             Tesseract.Rect analize_area = area.GetOCRArea();
             
-            if ( area != mDescrizioneArea )
+            if ( area.AreaType != SelectionAreaType.DescrizioneArea )
             {
                 //per le aree numeriche disattivo tutti i vocabolari e
                 //imposto i caratteri riconoscibili
@@ -626,9 +725,9 @@ namespace EstrattoContoOCR
             page.Dispose();
         }
 
-        private void  ShowHideRecognizedArea_Click (object sender, EventArgs args)
+        private void mAddAreaMenu_Click(object sender, EventArgs args)
         {
-            MenuItem item = sender as MenuItem;
+            /*MenuItem item = sender as MenuItem;
 
             SelectionArea area = item.Tag as SelectionArea;
 
@@ -639,7 +738,41 @@ namespace EstrattoContoOCR
             else
             {
                 area.ShowRecognizedAreas();
+            }*/
+
+            MenuItem item = sender as MenuItem;
+
+            SelectionAreaType type = (SelectionAreaType)item.Tag;
+
+            Point pt = Mouse.GetPosition(mImageCanvas);
+
+            SelectionArea area = new SelectionArea(pt.X, pt.Y, 100, 100, type, this);
+            area.AddToCanvas(mImageCanvas);
+            area.ShowArea();
+
+            List<SelectionArea> list = null;
+
+            switch (type)
+            {
+                case SelectionAreaType.DataOperazioneArea:
+                    list = mDataOperazioneAreas;
+                    break;
+                case SelectionAreaType.DataValutaArea:
+                    list = mDataValutaAreas;
+                    break;
+                case SelectionAreaType.DareArea:
+                    list = mDareAreaAreas;
+                    break;
+                case SelectionAreaType.AvereArea:
+                    list = mAvereAreaAreas;
+                    break;
+                case SelectionAreaType.DescrizioneArea:
+                    list = mDescrizioneAreas;
+                    break;
             }
+
+            list.Add(area);
+
         }
 
         public void SelectionArea_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)

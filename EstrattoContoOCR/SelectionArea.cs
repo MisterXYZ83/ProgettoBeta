@@ -16,13 +16,13 @@ namespace EstrattoContoOCR
     public enum SelectionAreaType
     {
         DataOperazioneArea = 0,
-        DataValutaArea,
-        DareArea,
-        AvereArea,
-        DescrizioneArea
+        DataValutaArea = 1,
+        DareArea = 2,
+        AvereArea = 3,
+        DescrizioneArea = 4
     };
 
-    class SelectionArea
+    public class SelectionArea
     {
         public Rectangle t, tl, tr, l, c, r, bl, b, br;
 
@@ -46,6 +46,8 @@ namespace EstrattoContoOCR
         private bool mRecognizedAreasVisible;
 
         private Canvas mParentCanvas;
+
+        private ContextMenu mContextMenu; 
 
         public SelectionArea(double top, double left, double w, double h, SelectionAreaType type, ISelectionAreaDelegate manager)
         {
@@ -122,11 +124,109 @@ namespace EstrattoContoOCR
             br.Tag = this;
             b.Tag = this;
 
+            mContextMenu = new ContextMenu();
+
+            c.ContextMenu = mContextMenu;
+
+            c.ContextMenuOpening += c_ContextMenuOpening;
+
             mRecognizedAreas = new List<RecognizedArea>();
-            
             
             HideArea();
 
+        }
+
+        void c_ContextMenuOpening(object sender, ContextMenuEventArgs e)
+        {
+            //creo menu contestuale per l'area
+            mContextMenu.Items.Clear();
+
+            MenuItem deleteArea = new MenuItem();
+            MenuItem analizeArea = new MenuItem();
+
+            deleteArea.Header = "Elimina Area";
+            deleteArea.Tag = this;
+            deleteArea.Click += deleteArea_Click;
+
+            analizeArea = new MenuItem();
+            analizeArea.Header = "Analizza Area con OCR";
+            analizeArea.Tag = this;
+            analizeArea.Click += analizeArea_Click;
+
+            mContextMenu.Items.Add(deleteArea);
+            mContextMenu.Items.Add(analizeArea);
+
+
+            if ( this.HasRecognizedData )
+            {
+                MenuItem mShowReconAreas = new MenuItem();
+
+                if ( this.RecognizedAreaVisible )
+                {
+                    mShowReconAreas.Header = "Nascondi Risultati OCR";
+                }
+                else
+                {
+                    mShowReconAreas.Header = "Mostra Risultati OCR";
+                }
+
+                mShowReconAreas.Tag = this;
+                mShowReconAreas.Click += mShowReconAreas_Click;
+
+                mContextMenu.Items.Add(mShowReconAreas);
+            }
+           
+        }
+
+        void mShowReconAreas_Click(object sender, RoutedEventArgs e)
+        {
+            if (mRecognizedAreasVisible)
+            {
+                HideRecognizedAreas();
+            }
+            else
+            {
+                ShowRecognizedAreas();
+            }
+        }
+
+        void RemoveSelectionFromCanvas()
+        {
+            mParentCanvas.Children.Remove(tl);
+            mParentCanvas.Children.Remove(tr);
+            
+            mParentCanvas.Children.Remove(t);
+            mParentCanvas.Children.Remove(r);
+            mParentCanvas.Children.Remove(l);
+            mParentCanvas.Children.Remove(c);
+            mParentCanvas.Children.Remove(b);
+
+            mParentCanvas.Children.Remove(bl);
+            mParentCanvas.Children.Remove(br);
+
+        }
+
+        void analizeArea_Click(object sender, RoutedEventArgs e)
+        {
+            if ( managerWindow != null )
+            {
+                managerWindow.OCRAreaAnalysis(this);
+            }
+        }
+
+        void deleteArea_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBoxResult dialogResult = MessageBox.Show("Eliminare l'area con tutti i risultati?", "Conferma", MessageBoxButton.YesNo);
+           
+            if ( dialogResult == MessageBoxResult.Yes )
+            {
+                ClearRecognizedArea();
+
+                HideArea();
+
+                RemoveSelectionFromCanvas();
+            }
+         
         }
 
         public void HideArea ()
