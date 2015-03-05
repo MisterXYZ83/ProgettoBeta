@@ -1,0 +1,147 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Windows;
+using System.Windows.Shapes;
+using System.Windows.Controls;
+using System.Windows.Media;
+using System.Windows.Input;
+
+using Tesseract;
+
+namespace EstrattoContoOCR
+{
+
+    class RecognizedArea
+    {
+
+        private Tesseract.Rect mAreaRect;
+        private string mText;
+
+        private Rectangle mShapeArea;
+
+        private Canvas mParentCanvas;
+
+        private SelectionArea mParentArea;
+
+        private ContextMenu mOptionsMenu;
+
+        private SolidColorBrush mSelectedColorFill;
+        private SolidColorBrush mUnselectedColorFill;
+
+        public Tesseract.Rect AreaRect
+        {
+            get { return mAreaRect; }
+        }
+
+
+        public string RecognizedData
+        {
+            get { return string.Copy(mText); }
+        }
+
+        public RecognizedArea ( SelectionArea parea, Tesseract.Rect rct, string text, float conf )
+        {
+            mParentArea = parea;
+
+            mShapeArea = new Rectangle();
+
+            SolidColorBrush lineColor = new SolidColorBrush();
+            lineColor.Color = Color.FromArgb(255, 0, 0, 0);
+
+            mSelectedColorFill = new SolidColorBrush();
+            mSelectedColorFill.Color = Color.FromArgb(80, 255, 0, 0);
+
+            mUnselectedColorFill = new SolidColorBrush();
+            mUnselectedColorFill.Color = Color.FromArgb(80, 255, 255, 255);
+
+            mShapeArea.Stroke = lineColor;
+            mShapeArea.Fill = mUnselectedColorFill;
+            mShapeArea.StrokeThickness = 2;
+
+            mAreaRect = new Tesseract.Rect(rct.X1, rct.Y1, rct.Width, rct.Height);
+            mText = String.Copy(text);
+
+            mOptionsMenu = new ContextMenu();
+
+            mShapeArea.ContextMenu = mOptionsMenu;
+            mShapeArea.ContextMenuOpening += OptionsMenuOpening;
+            mShapeArea.ContextMenuClosing += OptionsMenuClosing;
+
+        }
+
+        private void OptionsMenuOpening (object sender, ContextMenuEventArgs e)
+        {
+
+            mShapeArea.Fill = mSelectedColorFill;
+
+            mOptionsMenu.Items.Clear();
+
+            MenuItem title = new MenuItem();
+
+            title.Header = "Info OCR";
+
+            mOptionsMenu.Items.Add(title);
+
+            Separator separator = new Separator();
+
+            mOptionsMenu.Items.Add(separator);
+
+            MenuItem name = new MenuItem();
+            name.Header = "Testo Riconosciuto: \"" + mText.TrimEnd() + "\"";
+
+            mOptionsMenu.Items.Add(name);
+
+            MenuItem removeArea = new MenuItem();
+            removeArea.Header = "Elimina Area";
+            removeArea.Click += removeArea_Click;
+
+            mOptionsMenu.Items.Add(removeArea);
+
+        }
+        
+        void removeArea_Click(object sender, RoutedEventArgs e)
+        {
+            //elimino
+            if ( mParentArea != null)
+            {
+                mParentArea.RemoveArea(this);
+
+                RemoveAreaFromCanvas();
+            }
+        }
+
+        private void OptionsMenuClosing(object sender, ContextMenuEventArgs e)
+        {
+            mShapeArea.Fill = mUnselectedColorFill;
+        }
+
+        public void AddAreaInCanvas ( Canvas canvas )
+        {
+            //disegno l'area nel canvas
+            if ( canvas != null )
+            {
+                mParentCanvas = canvas;
+
+                mParentCanvas.Children.Add(mShapeArea);
+
+                mShapeArea.SetValue(Canvas.LeftProperty, Convert.ToDouble(mAreaRect.X1));
+                mShapeArea.SetValue(Canvas.TopProperty, Convert.ToDouble(mAreaRect.Y1));
+                mShapeArea.SetValue(Canvas.WidthProperty, Convert.ToDouble(mAreaRect.Width));
+                mShapeArea.SetValue(Canvas.HeightProperty, Convert.ToDouble(mAreaRect.Height));
+            }
+
+        }
+
+        public void RemoveAreaFromCanvas ( )
+        {
+            if ( mParentCanvas != null )
+            {
+                mParentCanvas.Children.Remove(mShapeArea);
+            }
+        }
+
+     
+    }
+}

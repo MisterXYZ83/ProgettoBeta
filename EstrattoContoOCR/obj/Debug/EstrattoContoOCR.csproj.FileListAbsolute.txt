@@ -1,0 +1,103 @@
+c:\users\dino\documents\visual studio 2013\Projects\EstrattoContoOCR\EstrattoContoOCR\bin\Debug\EstrattoContoOCR.exe.config
+c:\users\dino\documents\visual studio 2013\Projects\EstrattoContoOCR\EstrattoContoOCR\bin\Debug\x64\liblept168.dll
+c:\users\dino\documents\visual studio 2013\Projects\EstrattoContoOCR\EstrattoContoOCR\bin\Debug\x64\libtesseract302.dll
+c:\users\dino\documents\visual studio 2013\Projects\EstrattoContoOCR\EstrattoContoOCR\bin\Debug\x86\liblept168.dll
+c:\users\dino\documents\visual studio 2013\Projects\EstrattoContoOCR\EstrattoContoOCR\bin\Debug\x86\libtesseract302.dll
+c:\users\dino\documents\visual studio 2013\Projects\EstrattoContoOCR\EstrattoContoOCR\bin\Debug\EstrattoContoOCR.exe
+c:\users\dino\documents\visual studio 2013\Projects\EstrattoContoOCR\EstrattoContoOCR\bin\Debug\EstrattoContoOCR.pdb
+c:\users\dino\documents\visual studio 2013\Projects\EstrattoContoOCR\EstrattoContoOCR\bin\Debug\Tesseract.dll
+c:\users\dino\documents\visual studio 2013\Projects\EstrattoContoOCR\EstrattoContoOCR\bin\Debug\Tesseract.xml
+c:\users\dino\documents\visual studio 2013\Projects\EstrattoContoOCR\EstrattoContoOCR\obj\Debug\EstrattoContoOCR.csprojResolveAssemblyReference.cache
+c:\users\dino\documents\visual studio 2013\Projects\EstrattoContoOCR\EstrattoContoOCR\obj\Debug\MainWindow.baml
+c:\users\dino\documents\visual studio 2013\Projects\EstrattoContoOCR\EstrattoContoOCR\obj\Debug\MainWindow.g.cs
+c:\users\dino\documents\visual studio 2013\Projects\EstrattoContoOCR\EstrattoContoOCR\obj\Debug\App.g.cs
+c:\users\dino\documents\visual studio 2013\Projects\EstrattoContoOCR\EstrattoContoOCR\obj\Debug\EstrattoContoOCR_Content.g.cs
+c:\users\dino\documents\visual studio 2013\Projects\EstrattoContoOCR\EstrattoContoOCR\obj\Debug\EstrattoContoOCR_MarkupCompile.cache
+c:\users\dino\documents\visual studio 2013\Projects\EstrattoContoOCR\EstrattoContoOCR\obj\Debug\EstrattoContoOCR.g.resources
+c:\users\dino\documents\visual studio 2013\Projects\EstrattoContoOCR\EstrattoContoOCR\obj\Debug\EstrattoContoOCR.Properties.Resources.resources
+c:\users\dino\documents\visual studio 2013\Projects\EstrattoContoOCR\EstrattoContoOCR\obj\Debug\EstrattoContoOCR.csproj.GenerateResource.Cache
+c:\users\dino\documents\visual studio 2013\Projects\EstrattoContoOCR\EstrattoContoOCR\obj\Debug\EstrattoContoOCR.exe
+c:\users\dino\documents\visual studio 2013\Projects\EstrattoContoOCR\EstrattoContoOCR\obj\Debug\EstrattoContoOCR.pdb
+C:\Users\Marco\Desktop\EstrattoContoOCR\EstrattoContoOCR\bin\Debug\EstrattoContoOCR.exe.config
+C:\Users\Marco\Desktop\EstrattoContoOCR\EstrattoContoOCR\obj\Debug\EstrattoContoOCR.exe
+C:\Users\Marco\Desktop\EstrattoContoOCR\EstrattoContoOCR\obj\Debug\EstrattoContoOCR.pdb
+C:\Users\Marco\Desktop\EstrattoContoOCR\EstrattoContoOCR\bin\Debug\x64\liblept168.dll
+C:\Users\Marco\Desktop\EstrattoContoOCR\EstrattoContoOCR\bin\Debug\x64\libtesseract302.dll
+C:\Users\Marco\Desktop\EstrattoContoOCR\EstrattoContoOCR\bin\Debug\x86\liblept168.dll
+C:\Users\Marco\Desktop\EstrattoContoOCR\EstrattoContoOCR\bin\Debug\x86\libtesseract302.dll
+C:\Users\Marco\Desktop\EstrattoContoOCR\EstrattoContoOCR\bin\Debug\EstrattoContoOCR.exe
+C:\Users\Marco\Desktop\EstrattoContoOCR\EstrattoContoOCR\bin\Debug\EstrattoContoOCR.pdb
+C:\Users\Marco\Desktop\EstrattoContoOCR\EstrattoContoOCR\bin\Debug\Tesseract.dll
+C:\Users\Marco\Desktop\EstrattoContoOCR\EstrattoContoOCR\bin\Debug\Tesseract.xml
+C:\Users\Marco\Desktop\EstrattoContoOCR\EstrattoContoOCR\obj\Debug\MainWindow.baml
+C:\Users\Marco\Desktop\EstrattoContoOCR\EstrattoContoOCR\obj\Debug\MainWindow.g.cs
+C:\Users\Marco\Desktop\EstrattoContoOCR\EstrattoContoOCR\obj\Debug\App.g.cs
+C:\Users\Marco\Desktop\EstrattoContoOCR\EstrattoContoOCR\obj\Debug\EstrattoContoOCR_Content.g.cs
+C:\Users\Marco\Desktop\EstrattoContoOCR\EstrattoContoOCR\obj\Debug\EstrattoContoOCR_MarkupCompile.cache
+C:\Users\Marco\Desktop\EstrattoContoOCR\EstrattoContoOCR\obj\Debug\EstrattoContoOCR.g.resources
+C:\Users\Marco\Desktop\EstrattoContoOCR\EstrattoContoOCR\obj\Debug\EstrattoContoOCR.Properties.Resources.resources
+C:\Users\Marco\Desktop\EstrattoContoOCR\EstrattoContoOCR\obj\Debug\EstrattoContoOCR.csproj.GenerateResource.Cache
+C:\Users\Marco\Desktop\EstrattoContoOCR\EstrattoContoOCR\obj\Debug\OCRWindow.baml
+C:\Users\Marco\Desktop\EstrattoContoOCR\EstrattoContoOCR\obj\Debug\OCRWindow.g.cs
+C:\Users\Ancona\Desktop\EstrattoContoOCR\EstrattoContoOCR\bin\Debug\EstrattoContoOCR.exe.config
+C:\Users\Ancona\Desktop\EstrattoContoOCR\EstrattoContoOCR\obj\Debug\EstrattoContoOCR.exe
+C:\Users\Ancona\Desktop\EstrattoContoOCR\EstrattoContoOCR\obj\Debug\EstrattoContoOCR.pdb
+C:\Users\Ancona\Desktop\EstrattoContoOCR\EstrattoContoOCR\bin\Debug\x64\liblept168.dll
+C:\Users\Ancona\Desktop\EstrattoContoOCR\EstrattoContoOCR\bin\Debug\x64\libtesseract302.dll
+C:\Users\Ancona\Desktop\EstrattoContoOCR\EstrattoContoOCR\bin\Debug\x86\liblept168.dll
+C:\Users\Ancona\Desktop\EstrattoContoOCR\EstrattoContoOCR\bin\Debug\x86\libtesseract302.dll
+C:\Users\Ancona\Desktop\EstrattoContoOCR\EstrattoContoOCR\bin\Debug\EstrattoContoOCR.exe
+C:\Users\Ancona\Desktop\EstrattoContoOCR\EstrattoContoOCR\bin\Debug\EstrattoContoOCR.pdb
+C:\Users\Ancona\Desktop\EstrattoContoOCR\EstrattoContoOCR\bin\Debug\Tesseract.dll
+C:\Users\Ancona\Desktop\EstrattoContoOCR\EstrattoContoOCR\bin\Debug\Tesseract.xml
+C:\Users\Ancona\Desktop\EstrattoContoOCR\EstrattoContoOCR\obj\Debug\EstrattoContoOCR.csprojResolveAssemblyReference.cache
+C:\Users\Ancona\Desktop\EstrattoContoOCR\EstrattoContoOCR\obj\Debug\MainWindow.baml
+C:\Users\Ancona\Desktop\EstrattoContoOCR\EstrattoContoOCR\obj\Debug\OCRWindow.baml
+C:\Users\Ancona\Desktop\EstrattoContoOCR\EstrattoContoOCR\obj\Debug\MainWindow.g.cs
+C:\Users\Ancona\Desktop\EstrattoContoOCR\EstrattoContoOCR\obj\Debug\OCRWindow.g.cs
+C:\Users\Ancona\Desktop\EstrattoContoOCR\EstrattoContoOCR\obj\Debug\App.g.cs
+C:\Users\Ancona\Desktop\EstrattoContoOCR\EstrattoContoOCR\obj\Debug\EstrattoContoOCR_Content.g.cs
+C:\Users\Ancona\Desktop\EstrattoContoOCR\EstrattoContoOCR\obj\Debug\EstrattoContoOCR_MarkupCompile.cache
+C:\Users\Ancona\Desktop\EstrattoContoOCR\EstrattoContoOCR\obj\Debug\EstrattoContoOCR.g.resources
+C:\Users\Ancona\Desktop\EstrattoContoOCR\EstrattoContoOCR\obj\Debug\EstrattoContoOCR.Properties.Resources.resources
+C:\Users\Ancona\Desktop\EstrattoContoOCR\EstrattoContoOCR\obj\Debug\EstrattoContoOCR.csproj.GenerateResource.Cache
+C:\Users\Marco\Desktop\EstrattoContoOCR\EstrattoContoOCR\obj\Debug\EstrattoContoWindow.baml
+C:\Users\Marco\Desktop\EstrattoContoOCR\EstrattoContoOCR\obj\Debug\EstrattoContoWindow.g.cs
+C:\Users\Marco\Desktop\EstrattoContoOCR\EstrattoContoOCR\bin\Debug\Pratiche.mdf
+C:\Users\Marco\Desktop\EstrattoContoOCR\EstrattoContoOCR\bin\Debug\Pratiche_log.ldf
+C:\Users\Marco\Desktop\EstrattoContoOCR\EstrattoContoOCR\obj\Debug\AddUserForm.baml
+C:\Users\Marco\Desktop\EstrattoContoOCR\EstrattoContoOCR\obj\Debug\AddUserForm.g.cs
+C:\Users\Marco\Desktop\EstrattoContoOCR\EstrattoContoOCR\obj\Debug\EstrattoContoOCR.csprojResolveAssemblyReference.cache
+C:\Users\Marco\Desktop\EstrattoContoOCR\EstrattoContoOCR\bin\Debug\Microsoft.Windows.Shell.dll
+C:\Users\Marco\Desktop\EstrattoContoOCR\EstrattoContoOCR\bin\Debug\RibbonControlsLibrary.dll
+C:\Users\Marco\Desktop\EstrattoContoOCR\EstrattoContoOCR\bin\Debug\Microsoft.Windows.Shell.pdb
+C:\Users\Marco\Desktop\EstrattoContoOCR\EstrattoContoOCR\bin\Debug\Microsoft.Windows.Shell.xml
+C:\Users\Marco\Desktop\EstrattoContoOCR\EstrattoContoOCR\bin\Debug\RibbonControlsLibrary.pdb
+C:\Users\Marco\Desktop\EstrattoContoOCR\EstrattoContoOCR\bin\Debug\RibbonControlsLibrary.xml
+C:\Users\Marco\Documents\ocr\EstrattoContoOCR\EstrattoContoOCR\bin\Debug\EstrattoContoOCR.exe.config
+C:\Users\Marco\Documents\ocr\EstrattoContoOCR\EstrattoContoOCR\obj\Debug\EstrattoContoOCR.exe
+C:\Users\Marco\Documents\ocr\EstrattoContoOCR\EstrattoContoOCR\obj\Debug\EstrattoContoOCR.pdb
+C:\Users\Marco\Documents\ocr\EstrattoContoOCR\EstrattoContoOCR\bin\Debug\x64\liblept168.dll
+C:\Users\Marco\Documents\ocr\EstrattoContoOCR\EstrattoContoOCR\bin\Debug\x64\libtesseract302.dll
+C:\Users\Marco\Documents\ocr\EstrattoContoOCR\EstrattoContoOCR\bin\Debug\x86\liblept168.dll
+C:\Users\Marco\Documents\ocr\EstrattoContoOCR\EstrattoContoOCR\bin\Debug\x86\libtesseract302.dll
+C:\Users\Marco\Documents\ocr\EstrattoContoOCR\EstrattoContoOCR\bin\Debug\EstrattoContoOCR.exe
+C:\Users\Marco\Documents\ocr\EstrattoContoOCR\EstrattoContoOCR\bin\Debug\EstrattoContoOCR.pdb
+C:\Users\Marco\Documents\ocr\EstrattoContoOCR\EstrattoContoOCR\bin\Debug\Tesseract.dll
+C:\Users\Marco\Documents\ocr\EstrattoContoOCR\EstrattoContoOCR\bin\Debug\Tesseract.xml
+C:\Users\Marco\Documents\ocr\EstrattoContoOCR\EstrattoContoOCR\obj\Debug\MainWindow.baml
+C:\Users\Marco\Documents\ocr\EstrattoContoOCR\EstrattoContoOCR\obj\Debug\OCRWindow.baml
+C:\Users\Marco\Documents\ocr\EstrattoContoOCR\EstrattoContoOCR\obj\Debug\MainWindow.g.cs
+C:\Users\Marco\Documents\ocr\EstrattoContoOCR\EstrattoContoOCR\obj\Debug\OCRWindow.g.cs
+C:\Users\Marco\Documents\ocr\EstrattoContoOCR\EstrattoContoOCR\obj\Debug\App.g.cs
+C:\Users\Marco\Documents\ocr\EstrattoContoOCR\EstrattoContoOCR\obj\Debug\EstrattoContoOCR_Content.g.cs
+C:\Users\Marco\Documents\ocr\EstrattoContoOCR\EstrattoContoOCR\obj\Debug\EstrattoContoOCR_MarkupCompile.cache
+C:\Users\Marco\Documents\ocr\EstrattoContoOCR\EstrattoContoOCR\obj\Debug\EstrattoContoOCR.g.resources
+C:\Users\Marco\Documents\ocr\EstrattoContoOCR\EstrattoContoOCR\obj\Debug\EstrattoContoOCR.Properties.Resources.resources
+C:\Users\Marco\Documents\ocr\EstrattoContoOCR\EstrattoContoOCR\obj\Debug\EstrattoContoOCR.csproj.GenerateResource.Cache
+C:\Users\Marco\Documents\ocr\EstrattoContoOCR\EstrattoContoOCR\bin\Debug\Ghostscript.NET.dll
+C:\Users\Marco\Documents\ocr\EstrattoContoOCR\EstrattoContoOCR\bin\Debug\Ghostscript.NET.xml
+C:\Users\Marco\Documents\ocr\EstrattoContoOCR\EstrattoContoOCR\bin\Debug\ImageProcessor.dll
+C:\Users\Marco\Documents\ocr\EstrattoContoOCR\EstrattoContoOCR\obj\Debug\EstrattoContoOCR.csprojResolveAssemblyReference.cache
+C:\Users\Marco\Documents\ocr\EstrattoContoOCR\EstrattoContoOCR\bin\Debug\EPPlus.dll
+C:\Users\Marco\Documents\ocr\EstrattoContoOCR\EstrattoContoOCR\bin\Debug\EPPlus.xml

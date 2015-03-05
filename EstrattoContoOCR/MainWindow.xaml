@@ -1,0 +1,25 @@
+﻿<Window x:Class="EstrattoContoOCR.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Estratto Conto OCR" Height="241.463" Width="407.317" ResizeMode="CanMinimize">
+    <Grid Margin="0,0,0,0">
+        <StatusBar x:Name="mStatusBar" HorizontalAlignment="Left" Height="29" Margin="0,174,0,0" VerticalAlignment="Top" Width="401">
+            <StatusBarItem RenderTransformOrigin="0.524,-0.474">
+                <TextBlock Name="mStatusBarMessage"/>
+            </StatusBarItem>
+        </StatusBar>
+        <Menu Name="mMainMenu" HorizontalAlignment="Left" Height="22" VerticalAlignment="Top" Width="399">
+            <MenuItem Header="_Crea">
+                <MenuItem Header="_File" Click="FileMenuItem_Click"></MenuItem>
+                <MenuItem Header="_Scanner" Click="ScannerMenuItem_Click"></MenuItem>
+                <Separator />
+                <MenuItem Header="_Esci" Click="ExitMenuItem_Click"></MenuItem>
+            </MenuItem>
+
+            <MenuItem Header="_Estratto conto">
+                <MenuItem Header="_Analisi immagine" Click="ElaboraMenuItem_Click"></MenuItem>
+            </MenuItem>
+        </Menu>
+
+    </Grid>
+</Window>
