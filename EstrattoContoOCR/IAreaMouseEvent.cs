@@ -20,4 +20,14 @@ namespace EstrattoContoOCR
         //void SelectionArea_MouseMove(object sender, MouseEventArgs e);
 
     }
+
+    public interface IEditingToolDialogDelegate
+    {
+        void EditingToggle(bool actualState);
+        void EditingChangeToolType(EditingToolType newType);
+        void EditingChangeToolTickness(EditingToolThickness newTick);
+        void EditingUndoCorrection(int idx);
+        void EditingSaveCorrections();
+        void EditingSelectCorrection(int idx);
+    }
 }

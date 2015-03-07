@@ -27,12 +27,16 @@ namespace EstrattoContoOCR
         String mFilePath;
         OCRWindow mOcrWindow;
 
+        private System.Threading.CancellationTokenSource cancSource;
+
         public MainWindow()
         {
             InitializeComponent();
 
             mStatusBarMessage.Text = "Nessun file selezionato";
 
+            cancSource = new System.Threading.CancellationTokenSource();
+           
             mOcrWindow = new OCRWindow();
 
             this.Closing += MainWindow_Closing;
@@ -40,7 +44,7 @@ namespace EstrattoContoOCR
             mOcrWindow.Hide();
         }
 
-        private void FileMenuItem_Click(object sender, RoutedEventArgs e)
+        async private void FileMenuItem_Click(object sender, RoutedEventArgs e)
         {
             Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
 
@@ -55,7 +59,7 @@ namespace EstrattoContoOCR
                 mFilePath = dlg.FileName;
 
                 bool ret = mOcrWindow.SetImagePath(mFilePath);
-                
+               
                 if ( ret )
                 {
                     mStatusBarMessage.Text = mFilePath + " selezionato";

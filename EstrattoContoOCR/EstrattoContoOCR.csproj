@@ -85,6 +85,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="EditingDialogBox.xaml.cs">
+      <DependentUpon>EditingDialogBox.xaml</DependentUpon>
+    </Compile>
     <Compile Include="IAreaMouseEvent.cs" />
     <Compile Include="ImageFilter.cs" />
     <Compile Include="OCRWindow.xaml.cs">
@@ -95,6 +98,10 @@
     <Compile Include="WaitDialogBox.xaml.cs">
       <DependentUpon>WaitDialogBox.xaml</DependentUpon>
     </Compile>
+    <Page Include="EditingDialogBox.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -145,6 +152,8 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="pencil.png" />
+    <None Include="rubber.png" />
     <Content Include="x64\liblept168.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -174,6 +183,9 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Resources\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

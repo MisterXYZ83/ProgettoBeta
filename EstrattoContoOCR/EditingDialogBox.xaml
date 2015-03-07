@@ -1,0 +1,53 @@
+﻿<Window x:Class="EstrattoContoOCR.EditingDialogBox"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="EditingDialogBox" Height="350" Width="400" ResizeMode="CanMinimize">
+    <Grid Margin="15">
+      <Grid.RowDefinitions>
+        <RowDefinition Height="*" />
+        <RowDefinition Height="*" />
+        <RowDefinition Height="*" />
+        <RowDefinition Height="*" />
+        <RowDefinition Height="*" />
+        <RowDefinition Height="*" />
+      </Grid.RowDefinitions>
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="*" />
+      </Grid.ColumnDefinitions>
+
+      <Label Margin="10" Grid.Column="0" Grid.Row="0">Pennello:</Label>
+      <Label Margin="10" Grid.Column="0" Grid.Row="1">Spessore:</Label>
+
+      <ComboBox Margin="10" Grid.Row="0" Grid.Column="1" Name="cbBrush" SelectionChanged="Pencil_SelectionChanged">
+        <ComboBoxItem IsSelected="True">
+          <StackPanel Orientation="Horizontal">
+            <Image Width="20" Source="rubber.png" />
+            <TextBlock Foreground="Red">Gomma</TextBlock>
+          </StackPanel>
+        </ComboBoxItem>
+        <ComboBoxItem>
+          <StackPanel Orientation="Horizontal">
+            <Image Width="20" Source="pencil.png" />
+            <TextBlock Foreground="Black">Matita nera</TextBlock>
+          </StackPanel>
+        </ComboBoxItem>
+      </ComboBox>
+
+      <ComboBox Margin="10" Grid.Row="1" Grid.Column="1" Name="cbTick" SelectionChanged="Thick_SelectionChanged">
+        <ComboBoxItem IsSelected="True">Piccolo</ComboBoxItem>
+        <ComboBoxItem>Medio</ComboBoxItem>
+        <ComboBoxItem>Grande</ComboBoxItem>
+      </ComboBox>
+
+      <Label Margin="10" Grid.Column="0" Grid.Row="2">Storico:</Label>
+      <ComboBox Margin="10" Grid.Row="2" Grid.Column="1" Name="cbCorrection" SelectionChanged="Correction_SelectionChanged">
+      </ComboBox>
+      
+      <Button Height="20" Name="btToggle" Grid.Row="3" Grid.ColumnSpan="2" Click="DrawToggle_Click">Attiva</Button>
+      <Button Height="20" Name="btSave" Grid.Row="4" Grid.Column="0" Click="DrawSave_Click">Scrivi Tutto</Button>
+      <Button Height="20" Name="btUndo" Grid.Row="4" Grid.Column="1" Click="DrawUndo_Click">Annulla Selezione</Button>
+      <Button Height="20" Name="btRemoveAll" Grid.Row="5" Grid.Column="1" Click="DrawUndoAll_Click">Elimina Tutto</Button>
+      
+    </Grid>
+</Window>

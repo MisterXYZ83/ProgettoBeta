@@ -25,7 +25,10 @@ namespace EstrattoContoOCR
     /// <summary>
     /// Logica di interazione per OCRWindow.xaml
     /// </summary>
-    public partial class OCRWindow : Window, ISelectionAreaDelegate
+    /// 
+
+
+    public partial class OCRWindow : Window, ISelectionAreaDelegate, IEditingToolDialogDelegate
     {
 
         private double mAspectRatio;
@@ -53,8 +56,16 @@ namespace EstrattoContoOCR
         //private Pix mAnalyzableImage;
         private System.Drawing.Bitmap mAnalyzableImage;
 
+        private Dictionary<int,List<Visual>> mCorrections;
+        private List<Visual> mElementToDraw;
+
         private bool mReady;
 
+        EditingDialogBox mEditDialogBox;
+
+        private Point mCurrentEditPoint;
+        private Brush mCurrentBrush;
+        private double mCurrentThickness;
 
         public OCRWindow()
         {
@@ -103,6 +114,13 @@ namespace EstrattoContoOCR
             mOcrEngine.SetVariable("load_fixed_length_dawgs", false);
 
             this.Closing += OCRWindow_Closing;
+
+            mEditDialogBox = new EditingDialogBox(this);
+
+            mEditDialogBox.Hide();
+
+            mCorrections = new Dictionary<int, List<Visual>>();
+            mElementToDraw = new List<Visual>();
         }
 
         public bool OCRWindowReady
@@ -111,6 +129,131 @@ namespace EstrattoContoOCR
             {
                 return mReady;
             }
+        }
+
+        public void EditingToggle(bool actualState)
+        {
+            //attivazione della modalita di editing
+            if ( actualState )
+            {
+                //attivato!! 
+                //nascondo tutte le aree
+                HideAllSelectionAreas();
+
+                //attivo gli eventi mouse down/move/up per il canvas
+                mImageCanvas.MouseDown -= SelectionArea_MouseLeftButtonDown;
+                mImageCanvas.MouseUp -= SelectionArea_MouseLeftButtonUp;
+                mImageCanvas.MouseMove -= SelectionArea_MouseMove;
+
+                mImageCanvas.MouseDown += Editing_MouseDown;
+                mImageCanvas.MouseMove += Editing_MouseMove;
+                mImageCanvas.MouseUp += Editing_MouseUp;
+
+                //cambio cursore
+                mImageCanvas.Cursor = Cursors.Cross;
+            }
+            else
+            {
+                //disattivato
+                //mostro le aree
+                ShowAllSelectionAreas();
+
+                //attivo gli eventi mouse down/move/up per il canvas
+                mImageCanvas.MouseDown -= Editing_MouseDown;
+                mImageCanvas.MouseMove -= Editing_MouseMove;
+                mImageCanvas.MouseUp -= Editing_MouseUp;
+
+                mImageCanvas.MouseDown += SelectionArea_MouseLeftButtonDown;
+                mImageCanvas.MouseUp += SelectionArea_MouseLeftButtonUp;
+                mImageCanvas.MouseMove += SelectionArea_MouseMove;
+
+
+                //ripristino cursore
+                mImageCanvas.Cursor = Cursors.Arrow;
+
+                mElementToDraw = null;
+            }
+        }
+
+        void Editing_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+
+            //aggiungo
+            int item = mEditDialogBox.AddCorrection(mElementToDraw.Count);
+
+            mCorrections.Add(item, mElementToDraw);
+
+            //resetto
+            mElementToDraw = null;
+
+        }
+
+        void Editing_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                Line line = new Line();
+
+                line.Stroke = mCurrentBrush;
+                line.StrokeStartLineCap = PenLineCap.Round;
+                line.StrokeEndLineCap = PenLineCap.Round;
+                line.StrokeLineJoin = PenLineJoin.Round;
+                line.StrokeThickness = mCurrentThickness;
+                line.X1 = mCurrentEditPoint.X;
+                line.Y1 = mCurrentEditPoint.Y;
+                line.X2 = e.GetPosition(mImageCanvas).X;
+                line.Y2 = e.GetPosition(mImageCanvas).Y;
+
+                mCurrentEditPoint = e.GetPosition(mImageCanvas);
+
+                mImageCanvas.Children.Add(line);
+
+                mElementToDraw.Add(line);
+
+            }
+        }
+
+        void Editing_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ButtonState == MouseButtonState.Pressed)
+            {
+                mCurrentEditPoint = e.GetPosition(mImageCanvas);
+                mCurrentBrush = mEditDialogBox.CurrentBrush;
+                mCurrentThickness = (double)mEditDialogBox.ToolThickness;
+                
+                //nuova area;
+                mElementToDraw = new List<Visual>();
+            }
+        }
+
+        public void EditingUndoCorrection(int idx)
+        {
+            List<Visual> to_be_removed = null;
+
+            if ( mCorrections.ContainsKey(idx) )
+            {
+                to_be_removed = mCorrections[idx];
+            }
+
+            mCorrections.Remove(idx);
+
+            foreach ( UIElement obj in to_be_removed )
+            {
+                mImageCanvas.Children.Remove(obj);
+            }
+
+            //notifico
+            mEditDialogBox.RemoveCorrection(idx);
+        }
+
+        public void EditingSaveCorrections()
+        {
+
+        }
+
+        public void EditingSelectCorrection(int idx)
+        {
+
         }
 
         private void ClearSelectionAreas()
@@ -232,6 +375,9 @@ namespace EstrattoContoOCR
                     mAnalyzableImage = new System.Drawing.Bitmap(ms_o);
                 }
 
+                //senza filtro
+                mAnalyzableImage = new System.Drawing.Bitmap(ms_o);
+
                 //creo immagine anteprima
                 MemoryStream ms = new MemoryStream();
 
@@ -258,7 +404,7 @@ namespace EstrattoContoOCR
                 //mAnalyzableImage = Pix.LoadFromFile(mImagePath);
                 //mAnalyzableImage = new System.Drawing.Bitmap(mImagePath);
 
-                System.Drawing.Bitmap orig = new System.Drawing.Bitmap(mImagePath);
+                mAnalyzableImage = new System.Drawing.Bitmap(mImagePath);
                 
                 MessageBoxResult r2 = MessageBox.Show("Desideri applicare la pulitura (può richiedere tempo)?", "Conferma", MessageBoxButton.YesNo);
 
@@ -268,14 +414,12 @@ namespace EstrattoContoOCR
                     dbox.Owner = (Window)this.Parent;
                     dbox.Show();
 
-                   
-                    mAnalyzableImage = orig.MedianFilter(3, 0, true);
-                   
-                    
+
+                    mAnalyzableImage = mAnalyzableImage.MedianFilter(3, 0, true);
 
                     dbox.Close();
                     
-                    orig.Dispose();
+                    //orig.Dispose();
 
                 }
 
@@ -309,12 +453,19 @@ namespace EstrattoContoOCR
             return true;
         }
 
+   
+
         private void ScannerMenuItem_Click(object sender, RoutedEventArgs e)
         {
 
         }
 
-        private void Elabora_Click(object sender, RoutedEventArgs e)
+        private void Editing_Click(object sender, RoutedEventArgs e)
+        {
+            mEditDialogBox.Show();
+        }
+
+        private void Export_Click(object sender, RoutedEventArgs e)
         {/*
             if ( !mDataOperazioneArea.HasRecognizedData &&
                  !mDataValutaArea.HasRecognizedData && 
@@ -476,6 +627,7 @@ namespace EstrattoContoOCR
 
             e.Cancel = true;
 
+            mEditDialogBox.Hide();
             this.Hide();
         }
 
@@ -640,16 +792,60 @@ namespace EstrattoContoOCR
             MenuItem item = sender as MenuItem;
 
             List<SelectionArea> areas = item.Tag as List<SelectionArea>;
-    
-            foreach ( SelectionArea area in areas )
+
+            HideSelectionAreas(areas);
+        }
+
+        private void HideAllSelectionAreas()
+        {
+            HideSelectionAreas(mDataOperazioneAreas);
+            HideSelectionAreas(mDataValutaAreas);
+            HideSelectionAreas(mDareAreaAreas);
+            HideSelectionAreas(mAvereAreaAreas);
+            HideSelectionAreas(mDescrizioneAreas);
+        }
+
+        private void ToggleSelectionAreas(List<SelectionArea> list)
+        {
+            if (list == null) return;
+
+            foreach (SelectionArea area in list)
             {
-                if ( !area.AreaVisibility() )
+                if (!area.AreaVisibility())
                 {
                     area.ShowArea();
                 }
             }
         }
+        
+        private void HideSelectionAreas(List<SelectionArea> list)
+        {
+            if (list == null) return;
 
+            foreach (SelectionArea area in list)
+            {
+                area.HideArea();
+            }
+        }
+
+        private void ShowSelectionAreas(List<SelectionArea> list)
+        {
+            if (list == null) return;
+
+            foreach (SelectionArea area in list)
+            {
+                area.ShowArea();
+            }
+        }
+
+        public void ShowAllSelectionAreas()
+        {
+            ShowSelectionAreas(mDataOperazioneAreas);
+            ShowSelectionAreas(mDataValutaAreas);
+            ShowSelectionAreas(mDareAreaAreas);
+            ShowSelectionAreas(mAvereAreaAreas);
+            ShowSelectionAreas(mDescrizioneAreas);
+        }
 
         public void SelectionArea_MouseEnter(object sender, MouseEventArgs e)
         {
@@ -715,6 +911,15 @@ namespace EstrattoContoOCR
 
         }
 
+        public void EditingChangeToolType(EditingToolType newType)
+        {
+
+        }
+
+        public void EditingChangeToolTickness(EditingToolThickness newTick)
+        {
+
+        }
 
         public void OCRAreaAnalysis (SelectionArea area)
         {

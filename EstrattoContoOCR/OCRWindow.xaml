@@ -12,8 +12,9 @@
         </Grid.RowDefinitions>
 
         <Menu HorizontalAlignment="Left" Height="25" VerticalAlignment="Top" Width="789">
-            <MenuItem Header="Elaborazione OCR">
-                <MenuItem Header="Elabora" Click="Elabora_Click"></MenuItem>
+            <MenuItem Header="Operazioni OCR">
+                <MenuItem Header="Esporta in Excel" Click="Export_Click"></MenuItem>
+                <MenuItem Header="Pannello Editing" Click="Editing_Click"></MenuItem>
             </MenuItem>
         </Menu>
         <ScrollViewer HorizontalAlignment="Left"  Margin="0,30,0,0" VerticalAlignment="Top"  HorizontalScrollBarVisibility="Auto" Grid.Row="1" Grid.Column="1">

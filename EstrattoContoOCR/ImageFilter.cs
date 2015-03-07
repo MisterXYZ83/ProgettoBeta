@@ -79,7 +79,7 @@ namespace EstrattoContoOCR
 
             return newBitmap;
         }*/
-
+        
         public static Bitmap MedianFilter(this Bitmap sourceBitmap, 
                                                 int matrixSize,  
                                                   int bias = 0, 

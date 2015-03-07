@@ -129,4 +129,6 @@ C:\Users\Marco\Documents\GitHub\ProgettoBeta\EstrattoContoOCR\bin\Debug\Ghostscr
 C:\Users\Marco\Documents\GitHub\ProgettoBeta\EstrattoContoOCR\bin\Debug\Tesseract.xml
 C:\Users\Marco\Documents\GitHub\ProgettoBeta\EstrattoContoOCR\obj\Debug\WaitDialogBox.baml
 C:\Users\Marco\Documents\GitHub\ProgettoBeta\EstrattoContoOCR\obj\Debug\WaitDialogBox.g.cs
+C:\Users\Marco\Documents\GitHub\ProgettoBeta\EstrattoContoOCR\obj\Debug\EditingDialogBox.baml
+C:\Users\Marco\Documents\GitHub\ProgettoBeta\EstrattoContoOCR\obj\Debug\EditingDialogBox.g.cs
 C:\Users\Marco\Documents\GitHub\ProgettoBeta\EstrattoContoOCR\obj\Debug\EstrattoContoOCR.csprojResolveAssemblyReference.cache
