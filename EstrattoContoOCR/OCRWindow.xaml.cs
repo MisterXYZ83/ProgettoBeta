@@ -247,7 +247,7 @@ namespace EstrattoContoOCR
 
         void Editing_MouseMove(object sender, MouseEventArgs e)
         {
-            if (e.LeftButton == MouseButtonState.Pressed)
+            if ( mElementToDraw != null && e.LeftButton == MouseButtonState.Pressed)
             {
                 Line line = new Line();
 
@@ -371,6 +371,10 @@ namespace EstrattoContoOCR
             }*/
             try
             {
+                //rendo invisibili tutte le aree
+
+                HideAllSelectionAreas();
+
                 VisualBrush sourceBrush = new VisualBrush(mImageCanvas);
 
                 DrawingVisual drawingVisual = new DrawingVisual();
@@ -389,8 +393,16 @@ namespace EstrattoContoOCR
                 mAnalizeStream = null;
 
                 mAnalizeStream = new MemoryStream();
+
+                //convertitore formato RGB24 per OCR
+                FormatConvertedBitmap formatConverter = new FormatConvertedBitmap();
+                formatConverter.BeginInit();
+                formatConverter.DestinationFormat = PixelFormats.Rgb24;
+                formatConverter.Source = target;
+                formatConverter.EndInit();
+
                 BitmapEncoder encoder = new BmpBitmapEncoder();
-                encoder.Frames.Add(BitmapFrame.Create(target));
+                encoder.Frames.Add(BitmapFrame.Create(formatConverter));
                 encoder.Save(mAnalizeStream);
 
                 mAnalyzableImage = new System.Drawing.Bitmap(mAnalizeStream);
@@ -1085,7 +1097,19 @@ namespace EstrattoContoOCR
 
             List<SelectionArea> areas = item.Tag as List<SelectionArea>;
 
-            HideSelectionAreas(areas);
+            ShowSelectionAreas(areas);
+        }
+
+        public void RequireRemoveArea(SelectionArea area)
+        {
+            if ( area != null )
+            {
+                if (mDataOperazioneAreas.Contains(area)) mDataOperazioneAreas.Remove(area);
+                if (mDataValutaAreas.Contains(area)) mDataValutaAreas.Remove(area);
+                if (mDareAreaAreas.Contains(area)) mDareAreaAreas.Remove(area);
+                if (mAvereAreaAreas.Contains(area)) mAvereAreaAreas.Remove(area);
+                if (mDescrizioneAreas.Contains(area)) mDescrizioneAreas.Remove(area);
+            }
         }
 
         private void HideAllSelectionAreas()

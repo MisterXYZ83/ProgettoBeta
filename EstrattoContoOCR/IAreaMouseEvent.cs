@@ -12,7 +12,7 @@ namespace EstrattoContoOCR
     {
 
         void OCRAreaAnalysis(SelectionArea area);
-
+        void RequireRemoveArea(SelectionArea area);
         //void SelectionArea_MouseEnter(object sender, MouseEventArgs e);
         //void SelectionArea_MouseLeave(object sender, MouseEventArgs e);
         //void SelectionArea_MouseLeftButtonDown(object sender, MouseButtonEventArgs e);

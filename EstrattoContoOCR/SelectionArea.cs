@@ -260,6 +260,8 @@ namespace EstrattoContoOCR
                 HideArea();
 
                 RemoveSelectionFromCanvas();
+
+                managerWindow.RequireRemoveArea(this);
             }
          
         }
@@ -291,6 +293,8 @@ namespace EstrattoContoOCR
             mRecognizedAreasVisible = false;
 
             mAreaVisible = false;
+
+            HideRecognizedAreas();
         }
 
         public void ShowArea()
