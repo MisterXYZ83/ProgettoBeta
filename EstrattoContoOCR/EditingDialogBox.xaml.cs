@@ -130,6 +130,47 @@ namespace EstrattoContoOCR
             }
         }
 
+        public void ForceDeactive()
+        {
+            SetState(false);
+        }
+
+        private void SetState( bool state )
+        {
+            if ( state )
+            {
+                if (mEditingDelegate != null)
+                {
+                    mActive = true;
+                    mEditingDelegate.EditingToggle(mActive);
+
+                    btToggle.Content = "Disattiva";
+
+                    cbBrush.IsEnabled = false;
+                    cbCorrection.IsEnabled = false;
+                    cbTick.IsEnabled = false;
+                    btRemoveAll.IsEnabled = false;
+                    btUndo.IsEnabled = false;
+                    btSave.IsEnabled = false;
+                }
+            }
+            else
+            {
+                mActive = false;
+
+                if (mEditingDelegate != null) mEditingDelegate.EditingToggle(mActive);
+
+                btToggle.Content = "Attiva";
+
+                cbBrush.IsEnabled = true;
+                cbCorrection.IsEnabled = true;
+                cbTick.IsEnabled = true;
+                btRemoveAll.IsEnabled = true;
+                btUndo.IsEnabled = true;
+                btSave.IsEnabled = true;
+            }
+        }
+
         public void DrawToggle_Click(object sender, RoutedEventArgs e)
         {
             if ( mActive )
@@ -219,6 +260,27 @@ namespace EstrattoContoOCR
         public void DrawSave_Click(object sender, RoutedEventArgs e)
         {
             //salvo su file tutte le modifiche
+            MessageBoxResult result = MessageBox.Show("Confermi il salvataggio delle correzioni?", "Conferma", MessageBoxButton.YesNo);
+
+            if ( result == MessageBoxResult.Yes)
+            {
+                //salvo le correzioni
+                mEditingDelegate.EditingSaveCorrections();
+            }
+        }
+
+        public void DrawUndoSave_Click(object sender, RoutedEventArgs e)
+        {
+            //notifico il ripristino del precedente salvataggio
+            if ( mEditingDelegate.EditingHasSavedImages() )
+            {
+                MessageBoxResult res = MessageBox.Show("Desideri caricare l'ultimo salvataggio?", "Conferma", MessageBoxButton.YesNo);
+                
+                if ( res == MessageBoxResult.Yes)
+                {
+                    mEditingDelegate.EditingUndoLastSave();
+                }
+            }
         }
 
         public void DrawUndo_Click(object sender, RoutedEventArgs e)
@@ -242,6 +304,30 @@ namespace EstrattoContoOCR
         public void DrawUndoAll_Click(object sender, RoutedEventArgs e)
         {
             //annullo tutto
+            MessageBoxResult result = MessageBox.Show("Desideri eliminare tutte le correzioni?", "Conferma", MessageBoxButton.YesNo);
+
+            if (result == MessageBoxResult.Yes)
+            {
+                /*List<ComboBoxItem> items = new List<ComboBoxItem>();
+
+                foreach ( ComboBoxItem item in cbCorrection.Items )
+                {
+                    //int idx = (int)item.Tag;
+                    //mEditingDelegate.EditingUndoCorrection(idx);
+                    items.Add(item);
+                }
+
+                foreach ( ComboBoxItem item in items )
+                {
+                    int idx = (int)item.Tag;
+                    mEditingDelegate.EditingUndoCorrection(idx);
+                }*/
+
+                if ( mEditingDelegate != null )
+                {
+                    mEditingDelegate.EditingUndoCorrection(-1);
+                }
+            }
         }
 
         private void Correction_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -271,6 +357,11 @@ namespace EstrattoContoOCR
             cbCorrection.Items.Add(item);
 
             return ret;
+        }
+
+        public void RemoveAllCorrection ()
+        {
+            cbCorrection.Items.Clear();
         }
 
         public void RemoveCorrection ( int idx )

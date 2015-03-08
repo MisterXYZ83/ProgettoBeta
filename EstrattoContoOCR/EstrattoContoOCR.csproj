@@ -88,6 +88,9 @@
     <Compile Include="EditingDialogBox.xaml.cs">
       <DependentUpon>EditingDialogBox.xaml</DependentUpon>
     </Compile>
+    <Compile Include="EditRecognizedAreaDialogBox.xaml.cs">
+      <DependentUpon>EditRecognizedAreaDialogBox.xaml</DependentUpon>
+    </Compile>
     <Compile Include="IAreaMouseEvent.cs" />
     <Compile Include="ImageFilter.cs" />
     <Compile Include="OCRWindow.xaml.cs">
@@ -99,6 +102,10 @@
       <DependentUpon>WaitDialogBox.xaml</DependentUpon>
     </Compile>
     <Page Include="EditingDialogBox.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="EditRecognizedAreaDialogBox.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

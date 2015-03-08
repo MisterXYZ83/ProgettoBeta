@@ -10,11 +10,11 @@ none
 false
 DEBUG;TRACE
 C:\Users\Marco\Documents\GitHub\ProgettoBeta\EstrattoContoOCR\App.xaml
-4-1874171056
+5-648675379
 4-1843507102
-121751249133
+13-23849378
 21821841446
-EditingDialogBox.xaml;MainWindow.xaml;OCRWindow.xaml;WaitDialogBox.xaml;
+EditingDialogBox.xaml;EditRecognizedAreaDialogBox.xaml;MainWindow.xaml;OCRWindow.xaml;WaitDialogBox.xaml;
 
 False
 

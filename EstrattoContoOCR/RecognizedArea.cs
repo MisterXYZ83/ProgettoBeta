@@ -54,6 +54,12 @@ namespace EstrattoContoOCR
         public string RecognizedData
         {
             get { return string.Copy(mText); }
+
+            set
+            { 
+                mText = null;
+                mText = String.Copy(value);
+            }
         }
 
         public RecognizedArea ( SelectionArea parea, Tesseract.Rect rct, string text, float conf )
@@ -111,10 +117,16 @@ namespace EstrattoContoOCR
             mOptionsMenu.Items.Add(name);
 
             MenuItem removeArea = new MenuItem();
-            removeArea.Header = "Elimina Area";
-            removeArea.Click += removeArea_Click;
+            removeArea.Header = "Modifica Risultato";
+            removeArea.Click += modifyArea_Click;
 
             mOptionsMenu.Items.Add(removeArea);
+
+            MenuItem modifyArea = new MenuItem();
+            modifyArea.Header = "Elimina Area";
+            modifyArea.Click += removeArea_Click;
+
+            mOptionsMenu.Items.Add(modifyArea);
 
         }
         
@@ -132,6 +144,18 @@ namespace EstrattoContoOCR
                 mParentArea.SetAreaAsInactive(this);
 
             }
+        }
+
+        void modifyArea_Click(object sender, RoutedEventArgs e)
+        {
+            //apro dialog di modifica
+            EditRecognizedAreaDialogBox dialog = new EditRecognizedAreaDialogBox(this);
+
+            dialog.SetOldText(mText);
+
+            dialog.ShowDialog();
+
+            dialog.Close();
         }
 
         public void SelectStateArea (bool val)

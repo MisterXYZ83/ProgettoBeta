@@ -29,5 +29,7 @@ namespace EstrattoContoOCR
         void EditingUndoCorrection(int idx);
         void EditingSaveCorrections();
         void EditingSelectCorrection(int idx);
+        bool EditingHasSavedImages();
+        void EditingUndoLastSave();
     }
 }

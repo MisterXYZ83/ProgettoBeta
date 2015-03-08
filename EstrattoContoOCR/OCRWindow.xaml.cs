@@ -27,6 +27,37 @@ namespace EstrattoContoOCR
     /// </summary>
     /// 
 
+    public class CorrectionObject
+    {
+        public List<Visual> elements;
+        public EditingToolType type;
+
+        public CorrectionObject()
+        {
+            type = EditingToolType.Pencil;
+            elements = new List<Visual>();
+        }
+
+        public int Count
+        {
+            get
+            {
+                return elements.Count;
+            }
+        }
+
+        public CorrectionObject Add ( Visual obj )
+        {
+            elements.Add(obj);
+
+            return this;
+        }
+
+        public void Clear()
+        {
+            elements.Clear();
+        }
+    };
 
     public partial class OCRWindow : Window, ISelectionAreaDelegate, IEditingToolDialogDelegate
     {
@@ -56,16 +87,24 @@ namespace EstrattoContoOCR
         //private Pix mAnalyzableImage;
         private System.Drawing.Bitmap mAnalyzableImage;
 
-        private Dictionary<int,List<Visual>> mCorrections;
-        private List<Visual> mElementToDraw;
+        private Dictionary<int,CorrectionObject> mCorrections;
+        //private List<Visual> mElementToDraw;
+        private CorrectionObject mElementToDraw;
 
         private bool mReady;
+
+        private MemoryStream mAnalizeStream;
+        private MemoryStream mImageStream;
 
         EditingDialogBox mEditDialogBox;
 
         private Point mCurrentEditPoint;
         private Brush mCurrentBrush;
         private double mCurrentThickness;
+        private int mLastCorrectionSelected;
+
+        private Stack<string> mTemporaryFiles;
+        private string mTemporaryDir;
 
         public OCRWindow()
         {
@@ -119,8 +158,25 @@ namespace EstrattoContoOCR
 
             mEditDialogBox.Hide();
 
-            mCorrections = new Dictionary<int, List<Visual>>();
-            mElementToDraw = new List<Visual>();
+            mCorrections = new Dictionary<int, CorrectionObject>();
+            //mElementToDraw = new List<Visual>();
+            mElementToDraw = new CorrectionObject();
+
+            mLastCorrectionSelected = -2;
+
+            mTemporaryFiles = new Stack<string>();
+            mTemporaryDir = Guid.NewGuid().ToString();
+
+            try
+            {
+                Directory.CreateDirectory(mTemporaryDir);
+            }
+            catch (Exception exc)
+            {
+                MessageBox.Show("Errore creazione directory file temporanei...Chiusura applicazione!");
+
+                Application.Current.Shutdown();
+            }
         }
 
         public bool OCRWindowReady
@@ -184,6 +240,7 @@ namespace EstrattoContoOCR
             mCorrections.Add(item, mElementToDraw);
 
             //resetto
+            //mElementToDraw.Clear();
             mElementToDraw = null;
 
         }
@@ -222,13 +279,35 @@ namespace EstrattoContoOCR
                 mCurrentThickness = (double)mEditDialogBox.ToolThickness;
                 
                 //nuova area;
-                mElementToDraw = new List<Visual>();
+                mElementToDraw = new CorrectionObject();
             }
         }
 
         public void EditingUndoCorrection(int idx)
         {
-            List<Visual> to_be_removed = null;
+            if ( idx == -1 )
+            {
+                //rimuovo tutto
+                foreach ( int key in mCorrections.Keys )
+                {
+                    CorrectionObject corr = mCorrections[key];
+
+                    foreach (UIElement obj in corr.elements)
+                    {
+                        mImageCanvas.Children.Remove(obj);
+                    }
+
+                    corr.Clear();
+                }
+
+                mCorrections.Clear();
+
+                mEditDialogBox.RemoveAllCorrection();
+
+                return;
+            }
+
+            CorrectionObject to_be_removed = null;
 
             if ( mCorrections.ContainsKey(idx) )
             {
@@ -237,7 +316,7 @@ namespace EstrattoContoOCR
 
             mCorrections.Remove(idx);
 
-            foreach ( UIElement obj in to_be_removed )
+            foreach ( UIElement obj in to_be_removed.elements )
             {
                 mImageCanvas.Children.Remove(obj);
             }
@@ -248,12 +327,211 @@ namespace EstrattoContoOCR
 
         public void EditingSaveCorrections()
         {
+            //salvo tutto su file, salvo l'immagine attuale in temporaneo
+
+            //creo file temporaneo
+            string filename = null;
+
+            try
+            {
+
+                filename = mTemporaryDir + "\\" + Guid.NewGuid().ToString() + ".tmp";
+
+                MemoryStream ms_save = new MemoryStream();
+
+                mAnalyzableImage.Save(ms_save, System.Drawing.Imaging.ImageFormat.Png);
+
+                PngBitmapEncoder encoder = new PngBitmapEncoder();
+                encoder.Frames.Add(BitmapFrame.Create(ms_save));
+             
+                FileStream fs = File.Create(filename);
+                encoder.Save(fs);
+
+                fs.Close();
+                ms_save.Dispose();
+
+                //push sullo stack
+
+                mTemporaryFiles.Push(filename);
+
+            }
+            catch ( Exception exc )
+            {
+                MessageBox.Show("Errore durante il salvataggo dell'immagine..." + exc.Message );
+            }
+
+            //applico le modifiche all'immagine
+            RenderTargetBitmap target = new RenderTargetBitmap(mAnalyzableImage.Width,
+                mAnalyzableImage.Height, mAnalyzableImage.HorizontalResolution, mAnalyzableImage.VerticalResolution,
+                System.Windows.Media.PixelFormats.Pbgra32);
+
+            /*foreach ( Visual elem in elements )
+            {
+                target.Render(elem);
+            }*/
+            try
+            {
+                VisualBrush sourceBrush = new VisualBrush(mImageCanvas);
+
+                DrawingVisual drawingVisual = new DrawingVisual();
+                DrawingContext drawingContext = drawingVisual.RenderOpen();
+
+                Transform t = new ScaleTransform(96 / mAnalyzableImage.HorizontalResolution, 96 / mAnalyzableImage.VerticalResolution);
+
+                drawingContext.PushTransform(t);
+                drawingContext.DrawRectangle(sourceBrush, null, new System.Windows.Rect(0, 0, mAnalyzableImage.Width, mAnalyzableImage.Height));
+                drawingContext.Close();
+
+                target.Render(drawingVisual);
+                
+                //immagine analisi
+                if (mAnalizeStream != null) mAnalizeStream.Dispose();
+                mAnalizeStream = null;
+
+                mAnalizeStream = new MemoryStream();
+                BitmapEncoder encoder = new BmpBitmapEncoder();
+                encoder.Frames.Add(BitmapFrame.Create(target));
+                encoder.Save(mAnalizeStream);
+
+                mAnalyzableImage = new System.Drawing.Bitmap(mAnalizeStream);
+                
+                //immagine canvas
+                if (mImageStream != null) mImageStream.Dispose();
+                mImageStream = null;
+
+                mImageStream = new MemoryStream();
+
+                mAnalyzableImage.Save(mImageStream, System.Drawing.Imaging.ImageFormat.Bmp);
+                mImageStream.Seek(0, SeekOrigin.Begin);
+                mImage = new BitmapImage();
+                mImage.BeginInit();
+                mImage.StreamSource = mImageStream;
+                mImage.EndInit();
+
+                //aggiorno canvas
+                ImageBrush brush = new ImageBrush();
+
+                brush.ImageSource = mImage;
+
+                mImageCanvas.Background = brush;
+
+                mAspectRatio = mImage.Height / mImage.Width;
+
+                mImageCanvas.Width = mImage.PixelWidth;
+                mImageCanvas.Height = mImage.PixelHeight;
+            }
+            catch (Exception exc)
+            {
+                MessageBox.Show("Errore durante la scrittura dell'immagine...L'applicazione verra' chiusa" + exc.Message);
+                Application.Current.Shutdown();
+            }
+            
+
+
+        }
+
+        public bool EditingHasSavedImages()
+        {
+            return mTemporaryFiles.Count > 0;
+        }
+
+        public void EditingUndoLastSave()
+        {
+            //ripristino l'ultimo salvataggio
+
+            string last_save = mTemporaryFiles.Pop();
+
+            if (mAnalizeStream != null) mAnalizeStream.Dispose();
+            mAnalizeStream = null;
+
+            if (mImageStream != null) mImageStream.Dispose();
+            mImageStream = null;
+
+            mAnalyzableImage = new System.Drawing.Bitmap(last_save);
+
+            mImageStream = new MemoryStream();
+
+            mAnalyzableImage.Save(mImageStream, System.Drawing.Imaging.ImageFormat.Bmp);
+            mImageStream.Seek(0, SeekOrigin.Begin);
+            mImage = new BitmapImage();
+            mImage.BeginInit();
+            mImage.StreamSource = mImageStream;
+            mImage.EndInit();
+
+            ImageBrush brush = new ImageBrush();
+
+            brush.ImageSource = mImage;
+
+            mImageCanvas.Background = brush;
+
+            mAspectRatio = mImage.Height / mImage.Width;
+
+            mImageCanvas.Width = mImage.PixelWidth;
+            mImageCanvas.Height = mImage.PixelHeight;
+
 
         }
 
         public void EditingSelectCorrection(int idx)
         {
+            //SelectCorrection(idx);
+        }
 
+        private void DeselctAllCorrection ()
+        {
+            foreach (int key in mCorrections.Keys)
+            {
+                CorrectionObject elems = mCorrections[key];
+
+                foreach (Line obj in elems.elements)
+                {
+                    if (elems.type == EditingToolType.Pencil) obj.Stroke = mEditDialogBox.PencilBrush;
+                    else obj.Stroke = mEditDialogBox.RubberBrush;
+                }
+            }
+        }
+
+        private void SelectCorrection ( int idx )
+        {
+
+            if ( mCorrections.ContainsKey(idx) )
+            {
+                SolidColorBrush sel_color = new SolidColorBrush(Color.FromArgb(150, 255, 0, 0));
+
+                CorrectionObject to_be_mod = mCorrections[idx];
+                CorrectionObject old_corr = null;
+
+                if (mCorrections.ContainsKey(mLastCorrectionSelected)) old_corr = mCorrections[mLastCorrectionSelected];
+
+
+                foreach ( Line e in to_be_mod.elements )
+                {
+                    e.Stroke = sel_color;
+                }
+
+                if ( old_corr != null )
+                {
+                    SolidColorBrush pencil = mEditDialogBox.PencilBrush as SolidColorBrush;
+                    SolidColorBrush rubber = mEditDialogBox.RubberBrush as SolidColorBrush;
+
+                    if ( old_corr.type == EditingToolType.Pencil )
+                    {
+                        foreach ( Line e in old_corr.elements )
+                        {
+                            e.Stroke = pencil;
+                        }
+                    }
+                    else
+                    {
+                        foreach (Line e in old_corr.elements)
+                        {
+                            e.Stroke = rubber;
+                        }
+                    }
+                }
+
+                mLastCorrectionSelected = idx;
+            }
         }
 
         private void ClearSelectionAreas()
@@ -329,6 +607,20 @@ namespace EstrattoContoOCR
             mAvereArea.ClearRecognizedArea();
             mDescrizioneArea.ClearRecognizedArea();*/
 
+            //resetto il pannello di editing
+            mEditDialogBox.RemoveAllCorrection();
+            mCorrections.Clear();
+            mElementToDraw.Clear();
+            mElementToDraw = null;
+
+            mEditDialogBox.ForceDeactive();
+            mImageCanvas.Cursor = Cursors.Arrow;
+
+            if ( mAnalizeStream != null ) mAnalizeStream.Dispose();
+            mAnalizeStream = null;
+            if (mImageStream != null) mImageStream.Dispose();
+            mImageStream = null;
+
             //////
             mImagePath = img_path;
 
@@ -349,11 +641,11 @@ namespace EstrattoContoOCR
                 
                 System.Drawing.Image tmp_img = _rasterizer.GetPage(100, 100, 1);
 
-                MemoryStream ms_o = new MemoryStream();
+                mAnalizeStream = new MemoryStream();
 
-                tmp_img.Save(ms_o, System.Drawing.Imaging.ImageFormat.Bmp);
+                tmp_img.Save(mAnalizeStream, System.Drawing.Imaging.ImageFormat.Bmp);
 
-                System.Drawing.Bitmap orig = new System.Drawing.Bitmap(ms_o);
+                System.Drawing.Bitmap orig = new System.Drawing.Bitmap(mAnalizeStream);
 
                 MessageBoxResult r2 = MessageBox.Show("Desideri applicare la pulitura (può richiedere tempo)?", "Conferma", MessageBoxButton.YesNo);
 
@@ -367,25 +659,25 @@ namespace EstrattoContoOCR
 
                     dbox.Close();
 
-                    ms_o.Dispose();
+                    mAnalizeStream.Dispose();
                 }
                 else
                 {
                     //senza filtro
-                    mAnalyzableImage = new System.Drawing.Bitmap(ms_o);
+                    mAnalyzableImage = new System.Drawing.Bitmap(mAnalizeStream);
                 }
 
                 //senza filtro
-                mAnalyzableImage = new System.Drawing.Bitmap(ms_o);
+                mAnalyzableImage = new System.Drawing.Bitmap(mAnalizeStream);
 
                 //creo immagine anteprima
-                MemoryStream ms = new MemoryStream();
+                mImageStream = new MemoryStream();
 
-                mAnalyzableImage.Save(ms, System.Drawing.Imaging.ImageFormat.Bmp);
-                ms.Seek(0, SeekOrigin.Begin);
+                mAnalyzableImage.Save(mImageStream, System.Drawing.Imaging.ImageFormat.Bmp);
+                mImageStream.Seek(0, SeekOrigin.Begin);
                 mImage = new BitmapImage();
                 mImage.BeginInit();
-                mImage.StreamSource = ms;
+                mImage.StreamSource = mImageStream;
                 mImage.EndInit();
 
                 orig.Dispose();
@@ -423,13 +715,13 @@ namespace EstrattoContoOCR
 
                 }
 
-                MemoryStream ms = new MemoryStream();
+                mImageStream = new MemoryStream();
 
-                mAnalyzableImage.Save(ms, System.Drawing.Imaging.ImageFormat.Bmp);
-                ms.Seek(0, SeekOrigin.Begin);
+                mAnalyzableImage.Save(mImageStream, System.Drawing.Imaging.ImageFormat.Bmp);
+                mImageStream.Seek(0, SeekOrigin.Begin);
                 mImage = new BitmapImage();
                 mImage.BeginInit();
-                mImage.StreamSource = ms;
+                mImage.StreamSource = mImageStream;
                 mImage.EndInit();
 
                 
@@ -880,6 +1172,7 @@ namespace EstrattoContoOCR
             //area.SetStretching(false, pt);
             //area.ResetTransformPoint();
         }
+
         public void ShowHideAreaMenu_Click (object sender, EventArgs args)
         {
             /*MenuItem item = sender as MenuItem;
