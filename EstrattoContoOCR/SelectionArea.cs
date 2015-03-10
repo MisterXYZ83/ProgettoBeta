@@ -22,6 +22,34 @@ namespace EstrattoContoOCR
         DescrizioneArea = 4
     };
 
+
+    public class SelectionAreaPositionComparer : IComparer<SelectionArea>
+    {
+        public int Compare(SelectionArea x, SelectionArea y)
+        {
+            //la verifica consiste nel controllare l'ordinata delle aree riconosciute
+
+            if (x == null && y != null) return -1;
+            if (x == null && y == null) return 0;
+            if (x != null && y == null) return 1;
+
+            List<RecognizedArea> x_data = x.GetAreas();
+            List<RecognizedArea> y_data = y.GetAreas();
+
+            if (x_data.Count == 0 && y_data.Count > 0) return -1;
+            if (x_data.Count == 0 && x_data.Count == 0) return 0;
+            if (x_data.Count > 0 && y_data.Count == 0) return 1;
+
+            RecognizedArea x0 = x_data[0];
+            RecognizedArea y0 = y_data[0];
+
+            if (x0.AreaRect.Y1 < y0.AreaRect.Y1) return -1;
+            else if (x0.AreaRect.Y1 == y0.AreaRect.Y1) return 0;
+            else return 1; //(x0.AreaRect.Y1 > y0.AreaRect.Y1) return 1;
+
+        }
+    };
+
     public class SelectionArea
     {
         public Rectangle t, tl, tr, l, c, r, bl, b, br;

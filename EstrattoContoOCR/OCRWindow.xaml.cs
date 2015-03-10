@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.IO;
+using System.Globalization;
 
 using Ghostscript.NET;
 using Ghostscript.NET.Rasterizer;
@@ -106,6 +107,10 @@ namespace EstrattoContoOCR
         private Stack<string> mTemporaryFiles;
         private string mTemporaryDir;
 
+        private ExcelPackage mExcelFile;
+        private int mLastRowInserted;
+        private ExcelWorksheet mExcelActiveWorksheet;
+
         public OCRWindow()
         {
             InitializeComponent();
@@ -177,6 +182,8 @@ namespace EstrattoContoOCR
 
                 Application.Current.Shutdown();
             }
+
+            mExcelFile = null;
         }
 
         public bool OCRWindowReady
@@ -770,7 +777,285 @@ namespace EstrattoContoOCR
         }
 
         private void Export_Click(object sender, RoutedEventArgs e)
-        {/*
+        {
+            //verifica se ci sono dati da esportare
+            //verifico solo data operazione e valuta
+            if ( mDataOperazioneAreas.Count() <= 0 || mDataValutaAreas.Count() <= 0 )
+            {
+                MessageBox.Show("Nessun dato elaborato da salvare (Verificare Data Operazione/Valuta)!");
+
+                return;
+            }
+
+            bool create_excel = true;
+
+            if ( mExcelFile != null )
+            {
+                MessageBoxResult res = MessageBox.Show("Desideri usare il file Excel corrente?", "Conferma", MessageBoxButton.YesNo);
+
+                if ( res == MessageBoxResult.Yes )
+                {
+                    create_excel = false;
+                }
+            }
+           
+            if ( create_excel )
+            {
+                //creo il file excel
+                Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
+
+                dlg.DefaultExt = ".xlsx";
+                dlg.Filter = "Excel Files (*.xlsx)|*.xlsx";
+                dlg.CheckPathExists = false;
+                dlg.CheckFileExists = false;
+
+                Nullable<bool> result = dlg.ShowDialog();
+
+                if (result == false) return;
+    
+                
+                FileInfo fileinfo = new FileInfo(dlg.FileName);
+
+                if (mExcelFile != null) mExcelFile.Dispose();
+                mExcelFile = null;
+
+                mExcelFile = new ExcelPackage(fileinfo);
+                mLastRowInserted = 2;
+                
+                string title = "Pratica-";
+                title += DateTime.UtcNow.ToString();
+
+                mExcelActiveWorksheet = mExcelFile.Workbook.Worksheets.Add(title);
+                
+                //configuro le colonne e la prima riga
+                mExcelActiveWorksheet.Cells.AutoFitColumns();
+
+                mExcelActiveWorksheet.Cells["A1"].Value = "Data Operazione";
+                mExcelActiveWorksheet.Column(1).Style.Numberformat.Format = DateTimeFormatInfo.CurrentInfo.ShortDatePattern;
+
+                mExcelActiveWorksheet.Cells["B1"].Value = "Data Valuta";
+                mExcelActiveWorksheet.Column(2).Style.Numberformat.Format = DateTimeFormatInfo.CurrentInfo.ShortDatePattern;
+
+                mExcelActiveWorksheet.Cells["C1"].Value = "Dare";
+                mExcelActiveWorksheet.Column(3).Style.Numberformat.Format = @"_(""€""* #,##0.00_);_(""€""* \(#,##0.00\);_(""€""* ""-""??_);_(@_)";
+                mExcelActiveWorksheet.Column(3).Style.Font.Color.SetColor(System.Drawing.Color.Red);
+
+                mExcelActiveWorksheet.Cells["D1"].Value = "Avere";
+                mExcelActiveWorksheet.Column(4).Style.Numberformat.Format = @"_(""€""* #,##0.00_);_(""€""* \(#,##0.00\);_(""€""* ""-""??_);_(@_)";
+                mExcelActiveWorksheet.Column(4).Style.Font.Color.SetColor(System.Drawing.Color.FromArgb(0,128,64));
+
+                mExcelActiveWorksheet.Cells["E1"].Value = "Descrizione";
+
+                mExcelActiveWorksheet.Cells["A1:E1"].Style.Font.Bold = true;
+            }
+
+            //a questo punto ho un file excel su cui salvare
+            //
+
+            /*for (int k = 0; k < n; k++ )
+            {
+                SelectionArea p = mDataOperazioneAreas[k];
+                List<RecognizedArea> p_data = p.GetAreas();
+
+                str += "Area " + k;
+
+                if (p_data.Count > 0) str += ": " + p_data[0].RecognizedData + " ; " + p_data[0].AreaRect.Y1 + "\r\n";
+                else str += "empty\r\n";
+            }*/
+            
+            //ordino le liste
+
+            OrderSelectionAreaByPosition(mDataOperazioneAreas);
+            OrderSelectionAreaByPosition(mDataValutaAreas);
+            OrderSelectionAreaByPosition(mDareAreaAreas);
+            OrderSelectionAreaByPosition(mAvereAreaAreas);
+            OrderSelectionAreaByPosition(mDescrizioneAreas);
+
+            //ora ho le liste ordinate per Y, posso scrivere su file excel
+            //rettifico su un unica lista tutti i campi
+
+            List<RecognizedArea> operWrite = new List<RecognizedArea>();
+            List<RecognizedArea> valWrite = new List<RecognizedArea>();
+            List<RecognizedArea> dareWrite = new List<RecognizedArea>();
+            List<RecognizedArea> avereWrite = new List<RecognizedArea>();
+            List<RecognizedArea> descWrite = new List<RecognizedArea>();
+
+            int num_op = MergeResult(mDataOperazioneAreas, operWrite);
+            int num_val = MergeResult(mDataValutaAreas, valWrite);
+            int num_dare = MergeResult(mDareAreaAreas, dareWrite);
+            int num_avere = MergeResult(mAvereAreaAreas, avereWrite);
+            int num_desc = MergeResult(mDescrizioneAreas, descWrite);
+
+            //ora scrivo su excel data operazione & valuta
+            
+            int ov_row = 0;
+            for ( int k = 0 ; k < (num_op >= num_val ? num_op : num_val)  ; k++ )
+            {
+                string data_op = string.Empty;
+                string data_val = string.Empty;
+
+                try 
+                {
+                    data_op = operWrite[k].RecognizedData;
+                    data_val = valWrite[k].RecognizedData;
+                }
+                catch(Exception ex)
+                {
+                    //finito
+                }
+
+                mExcelActiveWorksheet.Cells[mLastRowInserted + ov_row, 1].Value = data_op;
+                mExcelActiveWorksheet.Cells[mLastRowInserted + ov_row, 2].Value = data_val;
+
+                ov_row++;
+            }
+
+            //dare / avere
+            int actual_dare = 0, actual_avere = 0;
+            int ad_row = 0;
+
+            do
+            {
+                RecognizedArea d = null, a = null;
+
+                if (actual_dare < num_dare && actual_avere < num_avere)
+                {
+                    d = dareWrite[actual_dare];
+                    a = avereWrite[actual_avere];
+                }
+                else if (actual_avere < num_avere)
+                {
+                    d = null;
+                    a = avereWrite[actual_avere];
+                }
+                else if (actual_dare < num_dare)
+                {
+                    a = null;
+                    d = dareWrite[actual_dare];
+                }
+                else break;
+
+                if (((d != null && a != null) && (d.AreaRect.Y1 < a.AreaRect.Y1)) || (d != null && a == null))
+                {
+                    //inserisco DARE
+
+                    actual_dare++;
+
+                    mExcelActiveWorksheet.Cells[mLastRowInserted + ad_row, 3].Value = d.RecognizedData;
+
+                    mExcelActiveWorksheet.Cells[mLastRowInserted + ad_row, 4].Value = "0";
+                    mExcelActiveWorksheet.Cells[mLastRowInserted + ad_row, 4].Style.Font.Color.SetColor(System.Drawing.Color.Black);
+                }
+                else if ((d != null && a != null) && (a.AreaRect.Y1 < d.AreaRect.Y1) || (d == null && a != null))
+                {
+                    //inserisco avere
+
+                    actual_avere++;
+
+                    mExcelActiveWorksheet.Cells[mLastRowInserted + ad_row, 4].Value = a.RecognizedData;
+
+                    mExcelActiveWorksheet.Cells[mLastRowInserted + ad_row, 3].Value = "0";
+                    mExcelActiveWorksheet.Cells[mLastRowInserted + ad_row, 3].Style.Font.Color.SetColor(System.Drawing.Color.Black);
+                }
+
+                ad_row++;
+            }
+            while (true);
+
+            //descrizione
+            int des_row = 0;
+            for (int k = 0; k < num_desc; k++)
+            {
+                string decriz = descWrite[k].RecognizedData != null ? descWrite[k].RecognizedData : string.Empty;
+
+                mExcelActiveWorksheet.Cells[mLastRowInserted + des_row, 5].Value = decriz;
+
+                des_row++;
+            }
+
+            List<int> rows = new List<int>();
+            rows.Add(ad_row);
+            rows.Add(ov_row);
+            rows.Add(des_row);
+            
+            int maxrow = rows.Max();
+            mLastRowInserted += maxrow;
+
+            mExcelFile.Save();
+        }
+
+        private int MergeResult (List<SelectionArea> areas, List<RecognizedArea> list)
+        {
+            
+            if ( areas != null )
+            {
+                int num = areas.Count;
+
+                for ( int k = 0 ; k < num ; k++ )
+                {
+                    SelectionArea elem = areas[k];
+
+                    if ( elem.HasRecognizedData )
+                    {
+                        List<RecognizedArea> results = elem.GetAreas();
+
+                        int nres = results.Count;
+
+                        for ( int p = 0 ; p < nres ; p++ )
+                        {
+                            list.Add(results[p]);
+                        }
+                    }
+                }
+            }
+
+            return list.Count;
+        }
+
+        private void OrderSelectionAreaByPosition ( List<SelectionArea> list )
+        {
+            if ( list != null && list.Count > 0 )
+            {
+                list.Sort(new SelectionAreaPositionComparer());
+            }
+        }
+        
+        private int GetNextValidArea(List<SelectionArea> list, int start_idx, out SelectionArea area)
+        {
+            if ( list == null || list.Count <= 0 )
+            {
+                area = null;
+                return -1;
+            }
+
+            //scorro sulla lista
+            
+            int idx = start_idx;
+
+            try
+            {
+                do
+                {
+                    area = list[idx];
+                    
+                    if (area.HasRecognizedData) break;
+
+                    idx++;
+                }
+                while (true);
+            }
+            catch (Exception exc)
+            {
+                //terminato
+                area = null;
+                return -1;
+            }
+
+            return idx;
+        }
+
+        /*private void Export_Click(object sender, RoutedEventArgs e)
+        {
             if ( !mDataOperazioneArea.HasRecognizedData &&
                  !mDataValutaArea.HasRecognizedData && 
                  !mDareArea.HasRecognizedData && !mAvereArea.HasRecognizedData )
@@ -923,8 +1208,8 @@ namespace EstrattoContoOCR
                 }
             }
 
-            pck.Save();*/
-        }
+            pck.Save();
+        }*/
           
         private void OCRWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
