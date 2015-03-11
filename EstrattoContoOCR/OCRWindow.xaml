@@ -13,6 +13,7 @@
 
         <Menu HorizontalAlignment="Left" Height="25" VerticalAlignment="Top" Width="789">
             <MenuItem Header="Operazioni OCR">
+                <MenuItem Header="Analizza tutte le aree" Click="Analize_Click"></MenuItem>
                 <MenuItem Header="Esporta in Excel" Click="Export_Click"></MenuItem>
                 <MenuItem Header="Pannello Editing" Click="Editing_Click"></MenuItem>
             </MenuItem>

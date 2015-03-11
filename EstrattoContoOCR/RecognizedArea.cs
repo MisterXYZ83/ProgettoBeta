@@ -129,7 +129,8 @@ namespace EstrattoContoOCR
             mOptionsMenu.Items.Add(modifyArea);
 
         }
-        
+
+     
         void removeArea_Click(object sender, RoutedEventArgs e)
         {
             //elimino
@@ -199,7 +200,6 @@ namespace EstrattoContoOCR
                 mParentCanvas.Children.Remove(mShapeArea);
             }
         }
-
      
     }
 }

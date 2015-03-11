@@ -776,6 +776,41 @@ namespace EstrattoContoOCR
             mEditDialogBox.Show();
         }
 
+
+        private void Analize_Click(object sender, RoutedEventArgs e)
+        {
+            //avvio l'analisi di tutte le aree attive
+            WaitDialogBox dialog = new WaitDialogBox();
+            dialog.Show();
+
+            foreach ( SelectionArea area in mDataOperazioneAreas )
+            {
+                AnalizeArea(area);
+            }
+
+            foreach (SelectionArea area in mDataValutaAreas)
+            {
+                AnalizeArea(area);
+            }
+
+            foreach (SelectionArea area in mDareAreaAreas)
+            {
+                AnalizeArea(area);
+            }
+
+            foreach (SelectionArea area in mAvereAreaAreas)
+            {
+                AnalizeArea(area);
+            }
+
+            foreach (SelectionArea area in mDescrizioneAreas)
+            {
+                AnalizeArea(area);
+            }
+
+            dialog.Close();
+        }
+
         private void Export_Click(object sender, RoutedEventArgs e)
         {
             //verifica se ci sono dati da esportare
@@ -941,9 +976,14 @@ namespace EstrattoContoOCR
 
                     actual_dare++;
 
-                    mExcelActiveWorksheet.Cells[mLastRowInserted + ad_row, 3].Value = d.RecognizedData;
+                    decimal v1,v2;
+                    decimal.TryParse(d.RecognizedData, out v1);
 
-                    mExcelActiveWorksheet.Cells[mLastRowInserted + ad_row, 4].Value = "0";
+                    mExcelActiveWorksheet.Cells[mLastRowInserted + ad_row, 3].Value = v1;
+
+                    decimal.TryParse("0", out v2);
+
+                    mExcelActiveWorksheet.Cells[mLastRowInserted + ad_row, 4].Value = v2;
                     mExcelActiveWorksheet.Cells[mLastRowInserted + ad_row, 4].Style.Font.Color.SetColor(System.Drawing.Color.Black);
                 }
                 else if ((d != null && a != null) && (a.AreaRect.Y1 < d.AreaRect.Y1) || (d == null && a != null))
@@ -952,9 +992,14 @@ namespace EstrattoContoOCR
 
                     actual_avere++;
 
-                    mExcelActiveWorksheet.Cells[mLastRowInserted + ad_row, 4].Value = a.RecognizedData;
+                    decimal v1,v2;
+                    decimal.TryParse(a.RecognizedData, out v1);
 
-                    mExcelActiveWorksheet.Cells[mLastRowInserted + ad_row, 3].Value = "0";
+                    mExcelActiveWorksheet.Cells[mLastRowInserted + ad_row, 4].Value = v1;
+
+                    decimal.TryParse("0", out v2);
+
+                    mExcelActiveWorksheet.Cells[mLastRowInserted + ad_row, 3].Value = v2;
                     mExcelActiveWorksheet.Cells[mLastRowInserted + ad_row, 3].Style.Font.Color.SetColor(System.Drawing.Color.Black);
                 }
 

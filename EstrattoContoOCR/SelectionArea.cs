@@ -77,7 +77,11 @@ namespace EstrattoContoOCR
 
         private Canvas mParentCanvas;
 
-        private ContextMenu mContextMenu; 
+        private ContextMenu mContextMenu;
+
+        private SolidColorBrush mCenterColorNormal;
+        private SolidColorBrush mCenterColorSelected;
+        private SolidColorBrush mCenterColorHasAreas;
 
         public SelectionArea(double top, double left, double w, double h, SelectionAreaType type, ISelectionAreaDelegate manager)
         {
@@ -109,8 +113,14 @@ namespace EstrattoContoOCR
             SolidColorBrush borderColor = new SolidColorBrush();
             borderColor.Color = Color.FromArgb(255, 0, 0, 0);
 
-            SolidColorBrush centerColor = new SolidColorBrush();
-            centerColor.Color = Color.FromArgb(100, 255, 255, 255);
+            mCenterColorNormal = new SolidColorBrush();
+            mCenterColorNormal.Color = Color.FromArgb(100, 255, 255, 255);
+
+            mCenterColorSelected = new SolidColorBrush();
+            mCenterColorSelected.Color = Color.FromArgb(120, 208, 175, 174);
+
+            mCenterColorHasAreas = new SolidColorBrush();
+            mCenterColorHasAreas.Color = Color.FromArgb(100, 255, 255, 102);
 
             mAreaInfos = new TextBlock();
             mAreaInfos.FontSize = 14;
@@ -127,7 +137,7 @@ namespace EstrattoContoOCR
             l.Fill = borderColor;
             r.Fill = borderColor;
             b.Fill = borderColor;
-            c.Fill = centerColor;
+            c.Fill = mCenterColorNormal;
 
             t.StrokeThickness = 0;
             tl.StrokeThickness = 0;
@@ -159,7 +169,7 @@ namespace EstrattoContoOCR
             c.ContextMenu = mContextMenu;
 
             c.ContextMenuOpening += c_ContextMenuOpening;
-
+            c.ContextMenuClosing += c_ContextMenuClosing;
             mRecognizedAreas = new List<RecognizedArea>();
             mDeletedAreas = new List<RecognizedArea>();
 
@@ -167,8 +177,35 @@ namespace EstrattoContoOCR
 
         }
 
+        void c_ContextMenuClosing(object sender, ContextMenuEventArgs e)
+        {
+            SetAreaColor(false);
+        }
+
+        private void SetAreaColor ( bool selected )
+        {
+            if ( selected )
+            {
+                //normale 
+                c.Fill = mCenterColorSelected;
+            }
+            
+            else 
+            {
+                if ( HasRecognizedData )
+                {
+                    c.Fill = mCenterColorHasAreas;
+                }
+                else
+                {
+                    c.Fill = mCenterColorNormal;
+                }
+            }
+        }
+
         void c_ContextMenuOpening(object sender, ContextMenuEventArgs e)
         {
+            SetAreaColor(true);
             //creo menu contestuale per l'area
             mContextMenu.Items.Clear();
 
@@ -187,6 +224,7 @@ namespace EstrattoContoOCR
             mContextMenu.Items.Add(deleteArea);
             mContextMenu.Items.Add(analizeArea);
 
+            mContextMenu.Items.Add(new Separator());
 
             if ( this.HasRecognizedData )
             {
@@ -235,9 +273,11 @@ namespace EstrattoContoOCR
 
                 last.SelectStateArea(false);
 
-                last.AddAreaInCanvas(mParentCanvas);
+                if (mRecognizedAreasVisible) last.AddAreaInCanvas(mParentCanvas);
 
                 mDeletedAreas.Remove(last);
+
+                SetAreaColor(false);
             }
         }
 
@@ -323,6 +363,8 @@ namespace EstrattoContoOCR
             mAreaVisible = false;
 
             HideRecognizedAreas();
+
+            SetAreaColor(false);
         }
 
         public void ShowArea()
@@ -339,6 +381,8 @@ namespace EstrattoContoOCR
             mAreaInfos.Visibility = System.Windows.Visibility.Visible;
 
             mAreaVisible = true;
+
+            SetAreaColor(false);
         }
 
         public bool AreaVisibility ()
@@ -502,6 +546,9 @@ namespace EstrattoContoOCR
                 ret = new RecognizedArea(this, rct, data_rec, conf);
 
                 mRecognizedAreas.Add(ret);
+
+                //imposto l'area come riconosciuta
+                SetAreaColor(false);
             }
 
             return ret;
@@ -656,7 +703,7 @@ namespace EstrattoContoOCR
                     {
                         RecognizedArea ra = mRecognizedAreas.ElementAt(k);
 
-                        ra.AddAreaInCanvas(mParentCanvas);
+                        if ( ra.Active ) ra.AddAreaInCanvas(mParentCanvas);
                     }
 
                     mRecognizedAreasVisible = true;
