@@ -60,6 +60,23 @@ namespace EstrattoContoOCR
         }
     };
 
+    public class OperationEntry
+    {
+
+        public RecognizedArea DataOperazione;
+        public RecognizedArea DataValuta;
+        public RecognizedArea Dare;
+        public RecognizedArea Avere;
+        public RecognizedArea Descrizione;
+
+        public OperationEntry ()
+        {
+            
+        }
+
+        
+    };
+
     public partial class OCRWindow : Window, ISelectionAreaDelegate, IEditingToolDialogDelegate
     {
 
@@ -558,26 +575,31 @@ namespace EstrattoContoOCR
             foreach ( SelectionArea area in mDataOperazioneAreas )
             {
                 area.ClearRecognizedArea();
+                area.RemoveFromCanvas();
             }
 
             foreach ( SelectionArea area in mDataValutaAreas )
             {
                 area.ClearRecognizedArea();
+                area.RemoveFromCanvas();
             }
 
             foreach ( SelectionArea area in mDareAreaAreas )
             {
                 area.ClearRecognizedArea();
+                area.RemoveFromCanvas();
             }
 
             foreach ( SelectionArea area in mAvereAreaAreas )
             {
                 area.ClearRecognizedArea();
+                area.RemoveFromCanvas();
             }
 
             foreach ( SelectionArea area in mDescrizioneAreas )
             {
                 area.ClearRecognizedArea();
+                area.RemoveFromCanvas();
             }
 
             mDataOperazioneAreas.Clear();
@@ -615,10 +637,10 @@ namespace EstrattoContoOCR
             }
 
             mImageCanvas.Background = null;
-
-            //svuoto le selection areas
-
+            //pulisco tutti i figli e svuoto le selection areas
             ClearSelectionAreas();
+
+
 
             /*mDataOperazioneArea.ClearRecognizedArea();
             mDataValutaArea.ClearRecognizedArea();
@@ -626,10 +648,13 @@ namespace EstrattoContoOCR
             mAvereArea.ClearRecognizedArea();
             mDescrizioneArea.ClearRecognizedArea();*/
 
+            //rimuovo tutte le correzioni dal canvas
+            EditingUndoCorrection(-1);
+
             //resetto il pannello di editing
             mEditDialogBox.RemoveAllCorrection();
             mCorrections.Clear();
-            mElementToDraw.Clear();
+            if (mElementToDraw != null) mElementToDraw.Clear();//////////////////////////////
             mElementToDraw = null;
 
             mEditDialogBox.ForceDeactive();
@@ -815,6 +840,134 @@ namespace EstrattoContoOCR
         {
             //verifica se ci sono dati da esportare
             //verifico solo data operazione e valuta
+            if (mDataOperazioneAreas.Count() <= 0 || mDataValutaAreas.Count() <= 0)
+            {
+                MessageBox.Show("Nessun dato elaborato da salvare (Verificare Data Operazione/Valuta)!");
+
+                return;
+            }
+
+            bool create_excel = true;
+
+            if (mExcelFile != null)
+            {
+                MessageBoxResult res = MessageBox.Show("Desideri usare il file Excel corrente?", "Conferma", MessageBoxButton.YesNo);
+
+                if (res == MessageBoxResult.Yes)
+                {
+                    create_excel = false;
+                }
+            }
+
+            if (create_excel)
+            {
+                //creo il file excel
+                Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
+
+                dlg.DefaultExt = ".xlsx";
+                dlg.Filter = "Excel Files (*.xlsx)|*.xlsx";
+                dlg.CheckPathExists = false;
+                dlg.CheckFileExists = false;
+
+                Nullable<bool> result = dlg.ShowDialog();
+
+                if (result == false) return;
+
+
+                FileInfo fileinfo = new FileInfo(dlg.FileName);
+
+                if (mExcelFile != null) mExcelFile.Dispose();
+                mExcelFile = null;
+
+                mExcelFile = new ExcelPackage(fileinfo);
+                mLastRowInserted = 2;
+
+                string title = "Pratica-";
+                title += DateTime.UtcNow.ToString();
+
+                mExcelActiveWorksheet = mExcelFile.Workbook.Worksheets.Add(title);
+
+                //configuro le colonne e la prima riga
+                mExcelActiveWorksheet.Cells.AutoFitColumns();
+
+                mExcelActiveWorksheet.Cells["A1"].Value = "Data Operazione";
+                mExcelActiveWorksheet.Column(1).Style.Numberformat.Format = DateTimeFormatInfo.CurrentInfo.ShortDatePattern;
+                mExcelActiveWorksheet.Column(1).Width = 100;
+                
+                mExcelActiveWorksheet.Cells["B1"].Value = "Data Valuta";
+                mExcelActiveWorksheet.Column(2).Style.Numberformat.Format = DateTimeFormatInfo.CurrentInfo.ShortDatePattern;
+                mExcelActiveWorksheet.Column(2).Width = 100;
+
+                mExcelActiveWorksheet.Cells["C1"].Value = "Dare";
+                mExcelActiveWorksheet.Column(3).Style.Numberformat.Format = @"_(""€""* #,##0.00_);_(""€""* \(#,##0.00\);_(""€""* ""-""??_);_(@_)";
+                mExcelActiveWorksheet.Column(3).Style.Font.Color.SetColor(System.Drawing.Color.Red);
+                mExcelActiveWorksheet.Column(3).Width = 100;
+
+                mExcelActiveWorksheet.Cells["D1"].Value = "Avere";
+                mExcelActiveWorksheet.Column(4).Style.Numberformat.Format = @"_(""€""* #,##0.00_);_(""€""* \(#,##0.00\);_(""€""* ""-""??_);_(@_)";
+                mExcelActiveWorksheet.Column(4).Style.Font.Color.SetColor(System.Drawing.Color.FromArgb(0, 128, 64));
+                mExcelActiveWorksheet.Column(4).Width = 100;
+
+                mExcelActiveWorksheet.Cells["E1"].Value = "Descrizione";
+                mExcelActiveWorksheet.Column(5).Width = 300;
+
+                mExcelActiveWorksheet.Cells["A1:E1"].Style.Font.Bold = true;
+            }
+
+            //ho la griglia dei risultati, scrivo su excel
+            List<OperationEntry> entries = CreateGrid();
+
+            int num_entries = entries.Count;
+
+            for ( int k = 0 ; k < num_entries ; k++ )
+            {
+                RecognizedArea op = entries[k].DataOperazione;
+                RecognizedArea val = entries[k].DataValuta;
+                RecognizedArea dare = entries[k].Dare;
+                RecognizedArea avere = entries[k].Avere;
+                RecognizedArea desc = entries[k].Descrizione;
+
+                //elaboro i dati
+                string data_op = op.RecognizedData;
+                string data_val = val.RecognizedData;
+                
+                decimal vd, va;
+
+                if (dare != null)
+                {
+                    decimal.TryParse(dare.RecognizedData, out vd);
+                }
+                else
+                {
+                    decimal.TryParse("0", out vd);
+                    mExcelActiveWorksheet.Cells[mLastRowInserted + k, 3].Style.Font.Color.SetColor(System.Drawing.Color.Black);
+                }
+
+                if (avere != null)
+                {
+                    decimal.TryParse(avere.RecognizedData, out va);
+                }
+                else
+                {
+                    decimal.TryParse("0", out va);
+                    mExcelActiveWorksheet.Cells[mLastRowInserted + k, 4].Style.Font.Color.SetColor(System.Drawing.Color.Black);
+                }
+
+                mExcelActiveWorksheet.Cells[mLastRowInserted + k, 3].Value = vd;
+                mExcelActiveWorksheet.Cells[mLastRowInserted + k, 4].Value = va;
+
+                if ( desc != null ) mExcelActiveWorksheet.Cells[mLastRowInserted + k, 5].Value = desc.RecognizedData;
+            }
+
+            mLastRowInserted += num_entries;
+
+            mExcelFile.Save();
+        }
+
+        private void old_Export_Click(object sender, RoutedEventArgs e)
+        {
+            //verifica se ci sono dati da esportare
+            //verifico solo data operazione e valuta
             if ( mDataOperazioneAreas.Count() <= 0 || mDataValutaAreas.Count() <= 0 )
             {
                 MessageBox.Show("Nessun dato elaborato da salvare (Verificare Data Operazione/Valuta)!");
@@ -920,7 +1073,7 @@ namespace EstrattoContoOCR
             int num_dare = MergeResult(mDareAreaAreas, dareWrite);
             int num_avere = MergeResult(mAvereAreaAreas, avereWrite);
             int num_desc = MergeResult(mDescrizioneAreas, descWrite);
-
+            
             //ora scrivo su excel data operazione & valuta
             
             int ov_row = 0;
@@ -1029,6 +1182,129 @@ namespace EstrattoContoOCR
             mExcelFile.Save();
         }
 
+        private List<OperationEntry> CreateGrid()
+        {
+            //ordino le liste per posizione 
+            OrderSelectionAreaByPosition(mDataOperazioneAreas);
+            OrderSelectionAreaByPosition(mDataValutaAreas);
+            OrderSelectionAreaByPosition(mDareAreaAreas);
+            OrderSelectionAreaByPosition(mAvereAreaAreas);
+            OrderSelectionAreaByPosition(mDescrizioneAreas);
+
+            //lista aree
+            List<RecognizedArea> operaz     = new List<RecognizedArea>();
+            List<RecognizedArea> valuta     = new List<RecognizedArea>();
+            List<RecognizedArea> dare       = new List<RecognizedArea>();
+            List<RecognizedArea> avere      = new List<RecognizedArea>();
+            List<RecognizedArea> descriz    = new List<RecognizedArea>();
+
+            //risultati
+            MergeResult(mDataOperazioneAreas, operaz);
+            MergeResult(mDataValutaAreas, valuta);
+            MergeResult(mDareAreaAreas, dare);
+            MergeResult(mAvereAreaAreas, avere);
+            MergeResult(mDescrizioneAreas, descriz);
+
+            List<OperationEntry> results = new List<OperationEntry>();
+
+            //per ogni data operazione cerco i corrispondenti
+            foreach ( RecognizedArea op in operaz )
+            {
+
+                OperationEntry entry = new OperationEntry();
+
+                entry.DataOperazione = op;
+
+                //centro dell'area
+                double y_op = 0.0;
+
+                y_op = (op.AreaRect.Y1 + op.AreaRect.Y2) * 0.5;
+
+                //valuta
+                foreach (RecognizedArea val in valuta)
+                {
+                    double y_val = (val.AreaRect.Y1 + val.AreaRect.Y2) * 0.5;
+
+                    if (Math.Abs(y_val - y_op) <= 10)
+                    {
+                        //ok, in riga
+
+                        entry.DataValuta = val;
+
+                        //rimuovo, velocizzo
+
+                        valuta.Remove(val);
+
+                        break;
+                    }
+                }
+
+                //dare/avere
+
+                foreach (RecognizedArea d in dare)
+                {
+                    double y_d = (d.AreaRect.Y1 + d.AreaRect.Y2) * 0.5;
+
+                    if (Math.Abs(y_d - y_op) <= 10)
+                    {
+                        //ok, in riga
+                        entry.Dare = d;
+
+                        //rimuovo, velocizzo
+
+                        dare.Remove(d);
+
+                        break;
+                    }
+                }
+
+                foreach (RecognizedArea a in avere)
+                {
+                    double y_a = (a.AreaRect.Y1 + a.AreaRect.Y2) * 0.5;
+
+                    if (Math.Abs(y_a - y_op) <= 10)
+                    {
+                        //ok, in riga
+
+                        entry.Avere = a;
+
+                        //rimuovo, velocizzo
+
+                        dare.Remove(a);
+
+                        break;
+                    }
+                }
+                
+
+                //descrizione
+
+                foreach (RecognizedArea de in descriz)
+                {
+                    double y_d = (de.AreaRect.Y1 + de.AreaRect.Y2) * 0.5;
+
+                    if (Math.Abs(y_d - y_op) <= 10)
+                    {
+                        //ok, in riga
+
+                        entry.Descrizione = de;
+
+                        //rimuovo, velocizzo
+
+                        descriz.Remove(de);
+
+                        break;
+                    }
+                }
+
+                //aggiungo
+                results.Add(entry);
+            }
+
+            return results;
+        }
+
+
         private int MergeResult (List<SelectionArea> areas, List<RecognizedArea> list)
         {
             
@@ -1048,7 +1324,7 @@ namespace EstrattoContoOCR
 
                         for ( int p = 0 ; p < nres ; p++ )
                         {
-                            list.Add(results[p]);
+                            if ( results[p].Active ) list.Add(results[p]);
                         }
                     }
                 }

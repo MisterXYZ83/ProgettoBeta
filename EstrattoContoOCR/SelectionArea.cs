@@ -307,6 +307,8 @@ namespace EstrattoContoOCR
             mParentCanvas.Children.Remove(bl);
             mParentCanvas.Children.Remove(br);
 
+            mParentCanvas.Children.Remove(mAreaInfos);
+
         }
 
         void analizeArea_Click(object sender, RoutedEventArgs e)
@@ -543,7 +545,19 @@ namespace EstrattoContoOCR
 
             if ( rct != null && data_rec != null )
             {
-                ret = new RecognizedArea(this, rct, data_rec, conf);
+                string data_to_add = String.Copy(data_rec);
+
+                if (mAreaType == SelectionAreaType.DataOperazioneArea || mAreaType == SelectionAreaType.DataValutaArea )
+                {
+                    //verifica se manca anno
+                    DateTime dt;
+                    DateTime.TryParse(data_rec, out dt);
+
+                    data_to_add = dt.ToShortDateString();
+
+                }
+
+                ret = new RecognizedArea(this, rct, data_to_add, conf);
 
                 mRecognizedAreas.Add(ret);
 
@@ -689,6 +703,11 @@ namespace EstrattoContoOCR
 
             mParentCanvas = cv;
 
+        }
+
+        public void RemoveFromCanvas()
+        {
+            RemoveSelectionFromCanvas();
         }
 
         public void ShowRecognizedAreas()
