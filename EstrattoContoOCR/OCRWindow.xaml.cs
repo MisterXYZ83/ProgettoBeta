@@ -842,32 +842,75 @@ namespace EstrattoContoOCR
         }
 
 
-        private void CreateExcelWorksheet(FileInfo fl, string sheetname)
+        private bool CreateExcelWorksheet(FileInfo fl, string sheetname)
         {
             mFileInfo = null;
 
             mFileInfo = fl;
 
+
             if (mExcelFile != null) mExcelFile.Dispose();
             mExcelFile = null;
 
-            mExcelFile = new ExcelPackage(mFileInfo);
+            do
+            {
+                try
+                {
+                    mExcelFile = new ExcelPackage(mFileInfo);
+                }
+                catch( Exception excp )
+                {
+                    MessageBoxResult res = MessageBox.Show("File Aperto! Chiudere il file e riprovare", "Conferma", MessageBoxButton.YesNo);
+
+                    if (res == MessageBoxResult.Yes)
+                    {
+                        continue;
+                    }
+                    else return false;
+                }
+
+                //se non becco l'eccezione esco
+                break;
+            }
+            while (true);
+        
+            
+            
+            
             mLastRowInserted = 2;
 
             //mWorksheetName = "Pratica-";
             //mWorksheetName += DateTime.UtcNow.ToString();
 
             mWorksheetName = sheetname;
-            
-            if ( mExcelFile.Workbook.Worksheets[mWorksheetName] == null )
+
+            try
             {
                 mExcelActiveWorksheet = mExcelFile.Workbook.Worksheets.Add(mWorksheetName);
             }
-            //else collisione!
+            catch ( Exception exc )
+            {
+                //gia esistente, creo uno nuovo
+
+                string pratica = "Pratica-";
+                //pratica += DateTime.UtcNow.ToLongTimeString().Replace(":", string.Empty);
+                pratica += Guid.NewGuid().ToString().Substring(0, 6);
+
+                mWorksheetName = pratica;
+                mExcelActiveWorksheet = mExcelFile.Workbook.Worksheets.Add(mWorksheetName);
+
+            }
 
             //configuro le colonne e la prima riga
-            mExcelActiveWorksheet.Cells.AutoFitColumns();
+            //mExcelActiveWorksheet.Cells.AutoFitColumns();
+            ConfigureWorksheet();
 
+            return true;
+            
+        }
+
+        private void ConfigureWorksheet ()
+        {
             mExcelActiveWorksheet.Cells["A1"].Value = "Data Operazione";
             mExcelActiveWorksheet.Column(1).Style.Numberformat.Format = DateTimeFormatInfo.CurrentInfo.ShortDatePattern;
             mExcelActiveWorksheet.Column(1).Width = 20;
@@ -930,11 +973,17 @@ namespace EstrattoContoOCR
                 if (result == false) return;
 
                 string pratica = "Pratica-";
-                pratica += DateTime.UtcNow.ToShortDateString().Replace(":", string.Empty);
+                pratica += DateTime.UtcNow.ToLongTimeString().Replace(":", string.Empty);
 
                 FileInfo f = new FileInfo(dlg.FileName);
 
-                CreateExcelWorksheet(f, pratica);
+                bool ret = CreateExcelWorksheet(f, pratica);
+
+                if ( !ret )
+                {
+                    MessageBox.Show("Esportazione abortita!");
+                    return;
+                }
             }
             else
             {
@@ -942,28 +991,63 @@ namespace EstrattoContoOCR
                 if (mExcelFile != null) mExcelFile.Dispose();
                 mExcelFile = null;
 
-                mExcelFile = new ExcelPackage(mFileInfo);
+                do
+                {
+                    try
+                    {
+                        mExcelFile = new ExcelPackage(mFileInfo);
+                    }
+                    catch (Exception excp)
+                    {
+                        MessageBoxResult res = MessageBox.Show("File Aperto! Chiudere il file e riprovare", "Conferma", MessageBoxButton.YesNo);
 
-                try
-                {
-                    mExcelActiveWorksheet = mExcelFile.Workbook.Worksheets[mWorksheetName];
+                        if (res == MessageBoxResult.Yes)
+                        {
+                            continue;
+                        }
+                        else
+                        {
+                            MessageBox.Show("Esportazione Abortita!");
+                            return;
+                        }
+                    }
+
+                    //se non becco l'eccezione esco
+                    break;
                 }
-                catch (Exception exc)
+                while (true);
+
+                int idx = 1;
+                int n_w = mExcelFile.Workbook.Worksheets.Count;
+
+                do
                 {
-                    MessageBox.Show("Errore durante l'apertura del file Excel: " + exc.Message);
-                    return;
+                    mExcelActiveWorksheet = mExcelFile.Workbook.Worksheets[idx++];
+
+                    if ( mExcelActiveWorksheet.Name.Equals(mWorksheetName) )
+                    {
+                        break;
+                    }
+
                 }
+                while (true);
                 
                 if ( mExcelActiveWorksheet == null )
                 {
                     //creo nuovo foglio
                     string pratica = "Pratica-";
-                    pratica += DateTime.UtcNow.ToShortDateString().Replace(":", string.Empty);
+                    pratica += Guid.NewGuid().ToString().Substring(0,6);
 
-                    CreateExcelWorksheet(mFileInfo, pratica);
+                    //CreateExcelWorksheet(mFileInfo, pratica);
+                    mExcelActiveWorksheet = mExcelFile.Workbook.Worksheets.Add(pratica);
+
+                    ConfigureWorksheet();
+
+                    mWorksheetName = pratica;
                 }
             }
 
+    
             //ho la griglia dei risultati, scrivo su excel
             List<OperationEntry> entries = CreateGrid();
 
