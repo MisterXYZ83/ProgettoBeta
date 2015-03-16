@@ -164,6 +164,9 @@ namespace EstrattoContoOCR
             br.Tag = this;
             b.Tag = this;
 
+         
+
+
             mContextMenu = new ContextMenu();
 
             c.ContextMenu = mContextMenu;
@@ -360,13 +363,13 @@ namespace EstrattoContoOCR
             br.Visibility = System.Windows.Visibility.Hidden;
             mAreaInfos.Visibility = System.Windows.Visibility.Hidden;
 
-            mRecognizedAreasVisible = false;
-
-            mAreaVisible = false;
+            //mRecognizedAreasVisible = false;
 
             HideRecognizedAreas();
 
             SetAreaColor(false);
+
+            mAreaVisible = false;
         }
 
         public void ShowArea()
@@ -700,8 +703,19 @@ namespace EstrattoContoOCR
             cv.Children.Add(b);
             cv.Children.Add(br);
             cv.Children.Add(mAreaInfos);
-
+            
             mParentCanvas = cv;
+
+            tl.SetValue(Canvas.ZIndexProperty, 2);
+            t.SetValue(Canvas.ZIndexProperty, 2);
+            tr.SetValue(Canvas.ZIndexProperty, 2);
+            l.SetValue(Canvas.ZIndexProperty, 2);
+            c.SetValue(Canvas.ZIndexProperty, 2);
+            r.SetValue(Canvas.ZIndexProperty, 2);
+            bl.SetValue(Canvas.ZIndexProperty, 2);
+            b.SetValue(Canvas.ZIndexProperty, 2);
+            br.SetValue(Canvas.ZIndexProperty, 2);
+            mAreaInfos.SetValue(Canvas.ZIndexProperty, 2);
 
         }
 

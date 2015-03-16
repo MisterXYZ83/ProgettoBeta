@@ -189,6 +189,7 @@ namespace EstrattoContoOCR
                 btRemoveAll.IsEnabled = true;
                 btUndo.IsEnabled = true;
                 btSave.IsEnabled = true;
+                btUndoWrite.IsEnabled = true;
             }
             else
             {
@@ -207,6 +208,7 @@ namespace EstrattoContoOCR
                     btRemoveAll.IsEnabled = false;
                     btUndo.IsEnabled = false;
                     btSave.IsEnabled = false;
+                    btUndoWrite.IsEnabled = false;
                 }
             }
         }
@@ -266,6 +268,9 @@ namespace EstrattoContoOCR
             {
                 //salvo le correzioni
                 mEditingDelegate.EditingSaveCorrections();
+
+                //elimino tutte le correzioni sul canvas
+                mEditingDelegate.EditingUndoCorrection(-1);
             }
         }
 

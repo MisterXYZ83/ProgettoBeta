@@ -77,6 +77,7 @@ namespace EstrattoContoOCR
             mUnselectedColorFill = new SolidColorBrush();
             mUnselectedColorFill.Color = Color.FromArgb(80, 255, 255, 255);
 
+            mShapeArea.SetValue(Canvas.ZIndexProperty, 2);
             mShapeArea.Stroke = lineColor;
             mShapeArea.Fill = mUnselectedColorFill;
             mShapeArea.StrokeThickness = 2;

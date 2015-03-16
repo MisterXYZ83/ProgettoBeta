@@ -124,9 +124,12 @@ namespace EstrattoContoOCR
         private Stack<string> mTemporaryFiles;
         private string mTemporaryDir;
 
+        private FileInfo mFileInfo;
+        private string mWorksheetName;
         private ExcelPackage mExcelFile;
         private int mLastRowInserted;
         private ExcelWorksheet mExcelActiveWorksheet;
+        private bool mEditingActive;
 
         public OCRWindow()
         {
@@ -253,6 +256,8 @@ namespace EstrattoContoOCR
 
                 mElementToDraw = null;
             }
+
+            mEditingActive = actualState;
         }
 
         void Editing_MouseUp(object sender, MouseButtonEventArgs e)
@@ -274,7 +279,7 @@ namespace EstrattoContoOCR
             if ( mElementToDraw != null && e.LeftButton == MouseButtonState.Pressed)
             {
                 Line line = new Line();
-
+                line.SetValue(Canvas.ZIndexProperty, 1);
                 line.Stroke = mCurrentBrush;
                 line.StrokeStartLineCap = PenLineCap.Round;
                 line.StrokeEndLineCap = PenLineCap.Round;
@@ -836,6 +841,57 @@ namespace EstrattoContoOCR
             dialog.Close();
         }
 
+
+        private void CreateExcelWorksheet(FileInfo fl, string sheetname)
+        {
+            mFileInfo = null;
+
+            mFileInfo = fl;
+
+            if (mExcelFile != null) mExcelFile.Dispose();
+            mExcelFile = null;
+
+            mExcelFile = new ExcelPackage(mFileInfo);
+            mLastRowInserted = 2;
+
+            //mWorksheetName = "Pratica-";
+            //mWorksheetName += DateTime.UtcNow.ToString();
+
+            mWorksheetName = sheetname;
+            
+            if ( mExcelFile.Workbook.Worksheets[mWorksheetName] == null )
+            {
+                mExcelActiveWorksheet = mExcelFile.Workbook.Worksheets.Add(mWorksheetName);
+            }
+            //else collisione!
+
+            //configuro le colonne e la prima riga
+            mExcelActiveWorksheet.Cells.AutoFitColumns();
+
+            mExcelActiveWorksheet.Cells["A1"].Value = "Data Operazione";
+            mExcelActiveWorksheet.Column(1).Style.Numberformat.Format = DateTimeFormatInfo.CurrentInfo.ShortDatePattern;
+            mExcelActiveWorksheet.Column(1).Width = 20;
+
+            mExcelActiveWorksheet.Cells["B1"].Value = "Data Valuta";
+            mExcelActiveWorksheet.Column(2).Style.Numberformat.Format = DateTimeFormatInfo.CurrentInfo.ShortDatePattern;
+            mExcelActiveWorksheet.Column(2).Width = 20;
+
+            mExcelActiveWorksheet.Cells["C1"].Value = "Dare";
+            mExcelActiveWorksheet.Column(3).Style.Numberformat.Format = @"_(""€""* #,##0.00_);_(""€""* \(#,##0.00\);_(""€""* ""-""??_);_(@_)";
+            mExcelActiveWorksheet.Column(3).Style.Font.Color.SetColor(System.Drawing.Color.Red);
+            mExcelActiveWorksheet.Column(3).Width = 25;
+
+            mExcelActiveWorksheet.Cells["D1"].Value = "Avere";
+            mExcelActiveWorksheet.Column(4).Style.Numberformat.Format = @"_(""€""* #,##0.00_);_(""€""* \(#,##0.00\);_(""€""* ""-""??_);_(@_)";
+            mExcelActiveWorksheet.Column(4).Style.Font.Color.SetColor(System.Drawing.Color.FromArgb(0, 128, 64));
+            mExcelActiveWorksheet.Column(4).Width = 25;
+
+            mExcelActiveWorksheet.Cells["E1"].Value = "Descrizione";
+            mExcelActiveWorksheet.Column(5).Width = 50;
+
+            mExcelActiveWorksheet.Cells["A1:E1"].Style.Font.Bold = true;
+        }
+
         private void Export_Click(object sender, RoutedEventArgs e)
         {
             //verifica se ci sono dati da esportare
@@ -873,45 +929,39 @@ namespace EstrattoContoOCR
 
                 if (result == false) return;
 
+                string pratica = "Pratica-";
+                pratica += DateTime.UtcNow.ToShortDateString().Replace(":", string.Empty);
 
-                FileInfo fileinfo = new FileInfo(dlg.FileName);
+                FileInfo f = new FileInfo(dlg.FileName);
 
+                CreateExcelWorksheet(f, pratica);
+            }
+            else
+            {
+                //carico esistente
                 if (mExcelFile != null) mExcelFile.Dispose();
                 mExcelFile = null;
 
-                mExcelFile = new ExcelPackage(fileinfo);
-                mLastRowInserted = 2;
+                mExcelFile = new ExcelPackage(mFileInfo);
 
-                string title = "Pratica-";
-                title += DateTime.UtcNow.ToString();
-
-                mExcelActiveWorksheet = mExcelFile.Workbook.Worksheets.Add(title);
-
-                //configuro le colonne e la prima riga
-                mExcelActiveWorksheet.Cells.AutoFitColumns();
-
-                mExcelActiveWorksheet.Cells["A1"].Value = "Data Operazione";
-                mExcelActiveWorksheet.Column(1).Style.Numberformat.Format = DateTimeFormatInfo.CurrentInfo.ShortDatePattern;
-                mExcelActiveWorksheet.Column(1).Width = 100;
+                try
+                {
+                    mExcelActiveWorksheet = mExcelFile.Workbook.Worksheets[mWorksheetName];
+                }
+                catch (Exception exc)
+                {
+                    MessageBox.Show("Errore durante l'apertura del file Excel: " + exc.Message);
+                    return;
+                }
                 
-                mExcelActiveWorksheet.Cells["B1"].Value = "Data Valuta";
-                mExcelActiveWorksheet.Column(2).Style.Numberformat.Format = DateTimeFormatInfo.CurrentInfo.ShortDatePattern;
-                mExcelActiveWorksheet.Column(2).Width = 100;
+                if ( mExcelActiveWorksheet == null )
+                {
+                    //creo nuovo foglio
+                    string pratica = "Pratica-";
+                    pratica += DateTime.UtcNow.ToShortDateString().Replace(":", string.Empty);
 
-                mExcelActiveWorksheet.Cells["C1"].Value = "Dare";
-                mExcelActiveWorksheet.Column(3).Style.Numberformat.Format = @"_(""€""* #,##0.00_);_(""€""* \(#,##0.00\);_(""€""* ""-""??_);_(@_)";
-                mExcelActiveWorksheet.Column(3).Style.Font.Color.SetColor(System.Drawing.Color.Red);
-                mExcelActiveWorksheet.Column(3).Width = 100;
-
-                mExcelActiveWorksheet.Cells["D1"].Value = "Avere";
-                mExcelActiveWorksheet.Column(4).Style.Numberformat.Format = @"_(""€""* #,##0.00_);_(""€""* \(#,##0.00\);_(""€""* ""-""??_);_(@_)";
-                mExcelActiveWorksheet.Column(4).Style.Font.Color.SetColor(System.Drawing.Color.FromArgb(0, 128, 64));
-                mExcelActiveWorksheet.Column(4).Width = 100;
-
-                mExcelActiveWorksheet.Cells["E1"].Value = "Descrizione";
-                mExcelActiveWorksheet.Column(5).Width = 300;
-
-                mExcelActiveWorksheet.Cells["A1:E1"].Style.Font.Bold = true;
+                    CreateExcelWorksheet(mFileInfo, pratica);
+                }
             }
 
             //ho la griglia dei risultati, scrivo su excel
@@ -953,6 +1003,8 @@ namespace EstrattoContoOCR
                     mExcelActiveWorksheet.Cells[mLastRowInserted + k, 4].Style.Font.Color.SetColor(System.Drawing.Color.Black);
                 }
 
+                mExcelActiveWorksheet.Cells[mLastRowInserted + k, 1].Value = data_op;
+                mExcelActiveWorksheet.Cells[mLastRowInserted + k, 2].Value = data_val;
                 mExcelActiveWorksheet.Cells[mLastRowInserted + k, 3].Value = vd;
                 mExcelActiveWorksheet.Cells[mLastRowInserted + k, 4].Value = va;
 
@@ -1375,163 +1427,6 @@ namespace EstrattoContoOCR
             return idx;
         }
 
-        /*private void Export_Click(object sender, RoutedEventArgs e)
-        {
-            if ( !mDataOperazioneArea.HasRecognizedData &&
-                 !mDataValutaArea.HasRecognizedData && 
-                 !mDareArea.HasRecognizedData && !mAvereArea.HasRecognizedData )
-            {
-                MessageBox.Show("Nessun dato elaborato da salvare!");
-
-                return;
-            }
-
-            Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
-
-            dlg.DefaultExt = ".xlsx";
-            dlg.Filter = "Excel Files (*.xlsx)|*.xlsx";
-            dlg.CheckPathExists = false;
-            dlg.CheckFileExists = false;
-
-            Nullable<bool> result = dlg.ShowDialog();
-
-            if ( result == false ) return;
-
-            
-            //salvo su un file excel
-            FileInfo newFile = new FileInfo(dlg.FileName);
-
-            ExcelPackage pck = new ExcelPackage(newFile);
-
-            string title = "OCR-";
-            title += DateTime.UtcNow.ToString();
-
-            ExcelWorksheet ws = pck.Workbook.Worksheets.Add(title);
-            
-            ws.Cells.AutoFitColumns();
-
-            ws.Cells["A1"].Value = "Data Operazione";
-            ws.Cells["B1"].Value = "Data Valuta";
-            ws.Cells["C1"].Value = "Dare";
-            ws.Cells["D1"].Value = "Avere";
-            ws.Cells["E1"].Value = "Descrizione";
-
-            ws.Cells["A1:E1"].Style.Font.Bold = true;
-
-            //scrittura dei valori
-
-            int n_valuta = 0;
-            int n_operaz = 0;
-
-            //data operazione
-            if ( mDataOperazioneArea.HasRecognizedData )
-            {
-                List<string> results = mDataOperazioneArea.GetResults();
-
-                int row = 1;
- 
-                foreach ( string rs in results )
-                {
-                    ws.Cells[row + 1, 1].Value = rs;
-                    row++;
-                    n_operaz++;
-                }
-            }
-
-            //data valuta
-            if (mDataValutaArea.HasRecognizedData)
-            {
-                List<string> results = mDataValutaArea.GetResults();
-
-                int row = 1;
-
-                foreach (string rs in results)
-                {
-                    ws.Cells[row + 1, 2].Value = rs;
-                    row++;
-                    n_valuta++;
-                }
-            }
-
-            
-
-            //DARE / AVERE
-            //inserisco in base alle coordinate delle aree
-            int actual_dare = 0;
-            int actual_avere = 0;
-            int ad_row = 2;
-            int ad_col = 0;
-
-            int n_dare = mDareArea.GetNumResults();
-            int n_avere = mAvereArea.GetNumResults();
-
-            RecognizedArea ad_r = null;
-            List<RecognizedArea> dare = mDareArea.GetAreas();
-            List<RecognizedArea> avere = mAvereArea.GetAreas();
-            RecognizedArea d = null;
-            RecognizedArea a = null;
-
-            do
-            {
-                if (actual_dare < n_dare && actual_avere < n_avere)
-                {
-                    d = dare[actual_dare];
-                    a = avere[actual_avere];
-                }
-                else if (actual_avere < n_avere)
-                {
-                    d = null;
-                    a = avere[actual_avere];
-                }
-                else if (actual_dare < n_dare)
-                {
-                    a = null;
-                    d = dare[actual_dare];
-                }
-                else break;
-
-                if ( ((d != null && a != null) && (d.AreaRect.Y1 < a.AreaRect.Y1)) || (d != null && a == null ) )
-                {
-                    //inserisco DARE
-
-                    actual_dare++;
-                    ad_col = 3;
-                    ad_r = d;
-                }
-                else if ((d != null && a != null) && (a.AreaRect.Y1 < d.AreaRect.Y1) || (d == null && a != null ) )
-                {
-                    //inserisco avere
-
-                    actual_avere++;
-                    ad_col = 4;
-                    ad_r = a;
-
-                }
-                
-
-                ws.Cells[ad_row, ad_col].Value = ad_r.RecognizedData;
-
-                ad_row++;
-            }
-            while (true);
-
-            //descrizione
-            if (mDescrizioneArea.HasRecognizedData)
-            {
-                List<string> results = mDescrizioneArea.GetResults();
-
-                int row = 1;
-
-                foreach (string rs in results)
-                {
-                    ws.Cells[row + 1, 5].Value = rs;
-                    row++;
-                }
-            }
-
-            pck.Save();
-        }*/
-          
         private void OCRWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
 
@@ -1553,6 +1448,7 @@ namespace EstrattoContoOCR
 
         private void RefreshOptionsMenu (ContextMenuEventArgs e)
         {
+            if (mEditingActive) return;
 
             mOptionsMenu.Items.Clear();
 

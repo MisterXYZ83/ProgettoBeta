@@ -45,10 +45,10 @@
       </ComboBox>
       
       <Button Height="20" Name="btToggle" Grid.Row="3" Grid.ColumnSpan="2" Click="DrawToggle_Click">Attiva</Button>
-      <Button Height="20" Name="btSave" Grid.Row="4" Grid.Column="0" Click="DrawSave_Click">Scrivi Tutto</Button>
-      <Button Height="20" Name="btUndo" Grid.Row="4" Grid.Column="1" Click="DrawUndo_Click">Annulla Selezione</Button>
+      <Button Height="20" Name="btSave" Grid.Row="4" Grid.Column="0" Click="DrawSave_Click">Applica Tutte le correzioni</Button>
+      <Button Height="20" Name="btUndo" Grid.Row="4" Grid.Column="1" Click="DrawUndo_Click">Annulla Correzione</Button>
       <Button Height="20" Name="btUndoWrite" Grid.Row="5" Grid.Column="1" Click="DrawUndoSave_Click">Ripristina Salvataggio</Button>
-      <Button Height="20" Name="btRemoveAll" Grid.Row="5" Grid.Column="0" Click="DrawUndoAll_Click">Elimina Tutto</Button>
+      <Button Height="20" Name="btRemoveAll" Grid.Row="5" Grid.Column="0" Click="DrawUndoAll_Click">Elimina Tutte le correzioni</Button>
       
     </Grid>
 </Window>
