@@ -167,7 +167,7 @@ namespace EstrattoContoOCR
             mDraggingArea = null;
 
             ////////TEMPORANEO !!! USARE CON VARIABILE D'AMBIENTE TESSDATA_PREFIX
-            mOcrEngine = new TesseractEngine("C:\\Users\\Marco\\Documents\\ocr\\tesseract-ocr\\tessdata", "ita", EngineMode.TesseractOnly);
+            mOcrEngine = new TesseractEngine("tesseract-ocr\\tessdata", "ita", EngineMode.TesseractOnly);
 
             mOcrEngine.SetVariable("load_system_dawg", false);
             mOcrEngine.SetVariable("load_freq_dawg", false);
@@ -258,6 +258,15 @@ namespace EstrattoContoOCR
             }
 
             mEditingActive = actualState;
+
+            /*if (mEditingActive)
+            {
+                mImageCanvas.ContextMenuOpening -= mImageCanvas_ContextMenuOpening;
+            }
+            else
+            {
+                mImageCanvas.ContextMenuOpening += mImageCanvas_ContextMenuOpening;
+            }*/
         }
 
         void Editing_MouseUp(object sender, MouseButtonEventArgs e)
@@ -877,7 +886,7 @@ namespace EstrattoContoOCR
             
             
             
-            mLastRowInserted = 2;
+            mLastRowInserted = 3;
 
             //mWorksheetName = "Pratica-";
             //mWorksheetName += DateTime.UtcNow.ToString();
@@ -922,17 +931,28 @@ namespace EstrattoContoOCR
             mExcelActiveWorksheet.Cells["C1"].Value = "Dare";
             mExcelActiveWorksheet.Column(3).Style.Numberformat.Format = @"_(""€""* #,##0.00_);_(""€""* \(#,##0.00\);_(""€""* ""-""??_);_(@_)";
             mExcelActiveWorksheet.Column(3).Style.Font.Color.SetColor(System.Drawing.Color.Red);
-            mExcelActiveWorksheet.Column(3).Width = 25;
+            mExcelActiveWorksheet.Column(3).Width = 20;
 
             mExcelActiveWorksheet.Cells["D1"].Value = "Avere";
             mExcelActiveWorksheet.Column(4).Style.Numberformat.Format = @"_(""€""* #,##0.00_);_(""€""* \(#,##0.00\);_(""€""* ""-""??_);_(@_)";
             mExcelActiveWorksheet.Column(4).Style.Font.Color.SetColor(System.Drawing.Color.FromArgb(0, 128, 64));
-            mExcelActiveWorksheet.Column(4).Width = 25;
+            mExcelActiveWorksheet.Column(4).Width = 20;
 
-            mExcelActiveWorksheet.Cells["E1"].Value = "Descrizione";
-            mExcelActiveWorksheet.Column(5).Width = 50;
+            mExcelActiveWorksheet.Cells["E1"].Value = "Saldo";
+            mExcelActiveWorksheet.Column(5).Style.Numberformat.Format = @"_(""€""* #,##0.00_);_(""€""* \(#,##0.00\);_(""€""* ""-""??_);_(@_)";
+            mExcelActiveWorksheet.Column(5).Style.Font.Color.SetColor(System.Drawing.Color.Black);
+            mExcelActiveWorksheet.Column(5).Width = 20;
 
-            mExcelActiveWorksheet.Cells["A1:E1"].Style.Font.Bold = true;
+            mExcelActiveWorksheet.Cells["F1"].Value = "Descrizione";
+            mExcelActiveWorksheet.Column(6).Width = 50;
+
+            mExcelActiveWorksheet.Cells["A1:F1"].Style.Font.Bold = true;
+
+            //inserisco il saldo iniziale
+            decimal zero;
+            decimal.TryParse("0", out zero);
+            mExcelActiveWorksheet.Cells["E2"].Value = zero;
+
         }
 
         private void Export_Click(object sender, RoutedEventArgs e)
@@ -1062,8 +1082,8 @@ namespace EstrattoContoOCR
                 RecognizedArea desc = entries[k].Descrizione;
 
                 //elaboro i dati
-                string data_op = op.RecognizedData;
-                string data_val = val.RecognizedData;
+                string data_op = op != null ? op.RecognizedData : string.Empty;
+                string data_val = val != null ? val.RecognizedData : string.Empty;
                 
                 decimal vd, va;
 
@@ -1092,7 +1112,11 @@ namespace EstrattoContoOCR
                 mExcelActiveWorksheet.Cells[mLastRowInserted + k, 3].Value = vd;
                 mExcelActiveWorksheet.Cells[mLastRowInserted + k, 4].Value = va;
 
-                if ( desc != null ) mExcelActiveWorksheet.Cells[mLastRowInserted + k, 5].Value = desc.RecognizedData;
+                //saldo
+                string formulasum = "=SUM(E" + (mLastRowInserted + k-1) + "+D" + (mLastRowInserted + k) + "-C" + (mLastRowInserted + k) + ")";
+                mExcelActiveWorksheet.Cells[mLastRowInserted + k, 5].Formula = formulasum;
+
+                if ( desc != null ) mExcelActiveWorksheet.Cells[mLastRowInserted + k, 6].Value = desc.RecognizedData;
             }
 
             mLastRowInserted += num_entries;
@@ -1144,7 +1168,7 @@ namespace EstrattoContoOCR
                 mExcelFile = null;
 
                 mExcelFile = new ExcelPackage(fileinfo);
-                mLastRowInserted = 2;
+                mLastRowInserted = 3;
                 
                 string title = "Pratica-";
                 title += DateTime.UtcNow.ToString();
@@ -1343,6 +1367,11 @@ namespace EstrattoContoOCR
 
             List<OperationEntry> results = new List<OperationEntry>();
 
+
+            //calcolo della distanza tra righe, stima...uso la colonna data operazione
+            double rowDistance = EstimateRowDistance(operaz);
+
+
             //per ogni data operazione cerco i corrispondenti
             foreach ( RecognizedArea op in operaz )
             {
@@ -1361,7 +1390,7 @@ namespace EstrattoContoOCR
                 {
                     double y_val = (val.AreaRect.Y1 + val.AreaRect.Y2) * 0.5;
 
-                    if (Math.Abs(y_val - y_op) <= 10)
+                    if (Math.Abs(y_val - y_op) <= rowDistance)
                     {
                         //ok, in riga
 
@@ -1381,7 +1410,7 @@ namespace EstrattoContoOCR
                 {
                     double y_d = (d.AreaRect.Y1 + d.AreaRect.Y2) * 0.5;
 
-                    if (Math.Abs(y_d - y_op) <= 10)
+                    if (Math.Abs(y_d - y_op) <= rowDistance)
                     {
                         //ok, in riga
                         entry.Dare = d;
@@ -1398,7 +1427,7 @@ namespace EstrattoContoOCR
                 {
                     double y_a = (a.AreaRect.Y1 + a.AreaRect.Y2) * 0.5;
 
-                    if (Math.Abs(y_a - y_op) <= 10)
+                    if (Math.Abs(y_a - y_op) <= rowDistance)
                     {
                         //ok, in riga
 
@@ -1419,7 +1448,7 @@ namespace EstrattoContoOCR
                 {
                     double y_d = (de.AreaRect.Y1 + de.AreaRect.Y2) * 0.5;
 
-                    if (Math.Abs(y_d - y_op) <= 10)
+                    if (Math.Abs(y_d - y_op) <= rowDistance)
                     {
                         //ok, in riga
 
@@ -1440,6 +1469,26 @@ namespace EstrattoContoOCR
             return results;
         }
 
+        private double EstimateRowDistance ( List<RecognizedArea> area )
+        {
+            double rowdist = 20.0; //valore di default
+
+            double medium = 0.0;
+
+            if (area == null || area.Count == 0) return rowdist;
+            //devo ricavare l'altezza media
+
+            foreach ( RecognizedArea a in area )
+            {
+                medium += a.AreaRect.Height;
+            }
+
+            medium /= area.Count;
+
+            rowdist = medium;
+
+            return rowdist;
+        }
 
         private int MergeResult (List<SelectionArea> areas, List<RecognizedArea> list)
         {
@@ -1532,7 +1581,11 @@ namespace EstrattoContoOCR
 
         private void RefreshOptionsMenu (ContextMenuEventArgs e)
         {
-            if (mEditingActive) return;
+            if (mEditingActive)
+            {
+                mOptionsMenu.Items.Clear();
+                return;
+            }
 
             mOptionsMenu.Items.Clear();
 
