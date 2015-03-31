@@ -134,3 +134,5 @@ C:\Users\Marco\Documents\GitHub\ProgettoBeta\EstrattoContoOCR\obj\Debug\EditingD
 C:\Users\Marco\Documents\GitHub\ProgettoBeta\EstrattoContoOCR\obj\Debug\EstrattoContoOCR.csprojResolveAssemblyReference.cache
 C:\Users\Marco\Documents\GitHub\ProgettoBeta\EstrattoContoOCR\obj\Debug\EditRecognizedAreaDialogBox.baml
 C:\Users\Marco\Documents\GitHub\ProgettoBeta\EstrattoContoOCR\obj\Debug\EditRecognizedAreaDialogBox.g.cs
+C:\Users\Marco\Documents\GitHub\ProgettoBeta\EstrattoContoOCR\obj\Debug\PDFPageSelector.baml
+C:\Users\Marco\Documents\GitHub\ProgettoBeta\EstrattoContoOCR\obj\Debug\PDFPageSelector.g.cs

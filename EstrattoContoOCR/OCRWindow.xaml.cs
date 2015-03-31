@@ -696,8 +696,17 @@ namespace EstrattoContoOCR
                 _rasterizer = new GhostscriptRasterizer();
 
                 _rasterizer.Open(img_path, _lastInstalledVersion, false);
-                
-                System.Drawing.Image tmp_img = _rasterizer.GetPage(100, 100, 1);
+
+                PDFPageSelector pageSel = new PDFPageSelector();
+                pageSel.PageManager = this;
+                pageSel.NumPages = _rasterizer.PageCount;
+
+                pageSel.ShowDialog();
+
+                //finestra chiusa
+                int selected_page = pageSel.SelectedPage;
+
+                System.Drawing.Image tmp_img = _rasterizer.GetPage(400, 400, selected_page);
 
                 mAnalizeStream = new MemoryStream();
 

@@ -96,6 +96,9 @@
     <Compile Include="OCRWindow.xaml.cs">
       <DependentUpon>OCRWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="PDFPageSelector.xaml.cs">
+      <DependentUpon>PDFPageSelector.xaml</DependentUpon>
+    </Compile>
     <Compile Include="RecognizedArea.cs" />
     <Compile Include="SelectionArea.cs" />
     <Compile Include="WaitDialogBox.xaml.cs">
@@ -123,6 +126,9 @@
     </Compile>
     <Page Include="OCRWindow.xaml">
       <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="PDFPageSelector.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="WaitDialogBox.xaml">
