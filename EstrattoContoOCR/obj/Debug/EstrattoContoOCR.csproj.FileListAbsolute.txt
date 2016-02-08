@@ -136,3 +136,38 @@ C:\Users\Marco\Documents\GitHub\ProgettoBeta\EstrattoContoOCR\obj\Debug\EditReco
 C:\Users\Marco\Documents\GitHub\ProgettoBeta\EstrattoContoOCR\obj\Debug\EditRecognizedAreaDialogBox.g.cs
 C:\Users\Marco\Documents\GitHub\ProgettoBeta\EstrattoContoOCR\obj\Debug\PDFPageSelector.baml
 C:\Users\Marco\Documents\GitHub\ProgettoBeta\EstrattoContoOCR\obj\Debug\PDFPageSelector.g.cs
+C:\Users\Marco\Documents\Visual Studio 2013\Projects\ProgettoBeta\EstrattoContoOCR\bin\Debug\EstrattoContoOCR.exe.config
+C:\Users\Marco\Documents\Visual Studio 2013\Projects\ProgettoBeta\EstrattoContoOCR\obj\Debug\EstrattoContoOCR.exe
+C:\Users\Marco\Documents\Visual Studio 2013\Projects\ProgettoBeta\EstrattoContoOCR\obj\Debug\EstrattoContoOCR.pdb
+C:\Users\Marco\Documents\Visual Studio 2013\Projects\ProgettoBeta\EstrattoContoOCR\bin\Debug\x64\liblept168.dll
+C:\Users\Marco\Documents\Visual Studio 2013\Projects\ProgettoBeta\EstrattoContoOCR\bin\Debug\x64\libtesseract302.dll
+C:\Users\Marco\Documents\Visual Studio 2013\Projects\ProgettoBeta\EstrattoContoOCR\bin\Debug\x86\liblept168.dll
+C:\Users\Marco\Documents\Visual Studio 2013\Projects\ProgettoBeta\EstrattoContoOCR\bin\Debug\x86\libtesseract302.dll
+C:\Users\Marco\Documents\Visual Studio 2013\Projects\ProgettoBeta\EstrattoContoOCR\bin\Debug\EstrattoContoOCR.exe
+C:\Users\Marco\Documents\Visual Studio 2013\Projects\ProgettoBeta\EstrattoContoOCR\bin\Debug\EstrattoContoOCR.pdb
+C:\Users\Marco\Documents\Visual Studio 2013\Projects\ProgettoBeta\EstrattoContoOCR\bin\Debug\EPPlus.dll
+C:\Users\Marco\Documents\Visual Studio 2013\Projects\ProgettoBeta\EstrattoContoOCR\bin\Debug\Ghostscript.NET.dll
+C:\Users\Marco\Documents\Visual Studio 2013\Projects\ProgettoBeta\EstrattoContoOCR\bin\Debug\ImageProcessor.dll
+C:\Users\Marco\Documents\Visual Studio 2013\Projects\ProgettoBeta\EstrattoContoOCR\bin\Debug\Tesseract.dll
+C:\Users\Marco\Documents\Visual Studio 2013\Projects\ProgettoBeta\EstrattoContoOCR\bin\Debug\EPPlus.xml
+C:\Users\Marco\Documents\Visual Studio 2013\Projects\ProgettoBeta\EstrattoContoOCR\bin\Debug\Ghostscript.NET.xml
+C:\Users\Marco\Documents\Visual Studio 2013\Projects\ProgettoBeta\EstrattoContoOCR\bin\Debug\Tesseract.xml
+C:\Users\Marco\Documents\Visual Studio 2013\Projects\ProgettoBeta\EstrattoContoOCR\obj\Debug\EstrattoContoOCR.csprojResolveAssemblyReference.cache
+C:\Users\Marco\Documents\Visual Studio 2013\Projects\ProgettoBeta\EstrattoContoOCR\obj\Debug\EditingDialogBox.baml
+C:\Users\Marco\Documents\Visual Studio 2013\Projects\ProgettoBeta\EstrattoContoOCR\obj\Debug\EditRecognizedAreaDialogBox.baml
+C:\Users\Marco\Documents\Visual Studio 2013\Projects\ProgettoBeta\EstrattoContoOCR\obj\Debug\MainWindow.baml
+C:\Users\Marco\Documents\Visual Studio 2013\Projects\ProgettoBeta\EstrattoContoOCR\obj\Debug\OCRWindow.baml
+C:\Users\Marco\Documents\Visual Studio 2013\Projects\ProgettoBeta\EstrattoContoOCR\obj\Debug\PDFPageSelector.baml
+C:\Users\Marco\Documents\Visual Studio 2013\Projects\ProgettoBeta\EstrattoContoOCR\obj\Debug\WaitDialogBox.baml
+C:\Users\Marco\Documents\Visual Studio 2013\Projects\ProgettoBeta\EstrattoContoOCR\obj\Debug\EditingDialogBox.g.cs
+C:\Users\Marco\Documents\Visual Studio 2013\Projects\ProgettoBeta\EstrattoContoOCR\obj\Debug\EditRecognizedAreaDialogBox.g.cs
+C:\Users\Marco\Documents\Visual Studio 2013\Projects\ProgettoBeta\EstrattoContoOCR\obj\Debug\MainWindow.g.cs
+C:\Users\Marco\Documents\Visual Studio 2013\Projects\ProgettoBeta\EstrattoContoOCR\obj\Debug\OCRWindow.g.cs
+C:\Users\Marco\Documents\Visual Studio 2013\Projects\ProgettoBeta\EstrattoContoOCR\obj\Debug\PDFPageSelector.g.cs
+C:\Users\Marco\Documents\Visual Studio 2013\Projects\ProgettoBeta\EstrattoContoOCR\obj\Debug\WaitDialogBox.g.cs
+C:\Users\Marco\Documents\Visual Studio 2013\Projects\ProgettoBeta\EstrattoContoOCR\obj\Debug\App.g.cs
+C:\Users\Marco\Documents\Visual Studio 2013\Projects\ProgettoBeta\EstrattoContoOCR\obj\Debug\EstrattoContoOCR_Content.g.cs
+C:\Users\Marco\Documents\Visual Studio 2013\Projects\ProgettoBeta\EstrattoContoOCR\obj\Debug\EstrattoContoOCR_MarkupCompile.cache
+C:\Users\Marco\Documents\Visual Studio 2013\Projects\ProgettoBeta\EstrattoContoOCR\obj\Debug\EstrattoContoOCR.g.resources
+C:\Users\Marco\Documents\Visual Studio 2013\Projects\ProgettoBeta\EstrattoContoOCR\obj\Debug\EstrattoContoOCR.Properties.Resources.resources
+C:\Users\Marco\Documents\Visual Studio 2013\Projects\ProgettoBeta\EstrattoContoOCR\obj\Debug\EstrattoContoOCR.csproj.GenerateResource.Cache

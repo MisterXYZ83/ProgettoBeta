@@ -175,7 +175,6 @@ namespace EstrattoContoOCR
             mOcrEngine.SetVariable("load_number_dawg", false);
             mOcrEngine.SetVariable("load_unambig_dawg", false);
             mOcrEngine.SetVariable("load_bigram_dawg", false);
-            mOcrEngine.SetVariable("load_fixed_length_dawgs", false);
 
             this.Closing += OCRWindow_Closing;
 

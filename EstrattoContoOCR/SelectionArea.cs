@@ -246,6 +246,14 @@ namespace EstrattoContoOCR
                 mShowReconAreas.Click += mShowReconAreas_Click;
 
                 mContextMenu.Items.Add(mShowReconAreas);
+
+                MenuItem copyItem = new MenuItem();
+
+                copyItem.Header = "Copia risultati";
+                copyItem.Tag = this;
+                copyItem.Click += copyItem_Click;
+
+                mContextMenu.Items.Add(copyItem);
             }
 
             //mostro l'annulla rimozione
@@ -261,6 +269,20 @@ namespace EstrattoContoOCR
                 mContextMenu.Items.Add(undoArea);
             }
            
+        }
+
+        void copyItem_Click(object sender, RoutedEventArgs e)
+        {
+            string copy_text = "";
+
+            SelectionArea area = (sender as MenuItem).Tag as SelectionArea;
+
+            for ( int k = 0 ; k < area.mRecognizedAreas.Count ; k++ )
+            {
+                copy_text += mRecognizedAreas[k].RecognizedData + "\r\n";
+            }
+
+            Clipboard.SetText(copy_text);
         }
 
         void undoArea_Click(object sender, RoutedEventArgs e)
