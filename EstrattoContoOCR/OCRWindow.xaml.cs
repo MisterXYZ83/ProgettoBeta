@@ -17,7 +17,8 @@ using System.Globalization;
 using Ghostscript.NET;
 using Ghostscript.NET.Rasterizer;
 
-using Tesseract;
+//using Tesseract;
+using IronOcr;
 
 using OfficeOpenXml;
 
@@ -101,7 +102,8 @@ namespace EstrattoContoOCR
 
         private SelectionArea mDraggingArea;
         private Rectangle mDraggingRectangle;
-        private TesseractEngine mOcrEngine;
+        //private TesseractEngine mOcrEngine;
+        private AdvancedOcr mOcrEngine;
         //private Pix mAnalyzableImage;
         private System.Drawing.Bitmap mAnalyzableImage;
 
@@ -167,14 +169,29 @@ namespace EstrattoContoOCR
             mDraggingArea = null;
 
             ////////TEMPORANEO !!! USARE CON VARIABILE D'AMBIENTE TESSDATA_PREFIX
-            mOcrEngine = new TesseractEngine("tesseract-ocr\\tessdata", "ita", EngineMode.TesseractOnly);
+            /*mOcrEngine = new TesseractEngine("tesseract-ocr\\tessdata", "ita", EngineMode.TesseractOnly);
 
             mOcrEngine.SetVariable("load_system_dawg", false);
             mOcrEngine.SetVariable("load_freq_dawg", false);
             mOcrEngine.SetVariable("load_punc_dawg", false);
             mOcrEngine.SetVariable("load_number_dawg", false);
             mOcrEngine.SetVariable("load_unambig_dawg", false);
-            mOcrEngine.SetVariable("load_bigram_dawg", false);
+            mOcrEngine.SetVariable("load_bigram_dawg", false);*/
+
+            mOcrEngine = new AdvancedOcr()
+            {
+                CleanBackgroundNoise = true,
+                EnhanceContrast = true,
+                EnhanceResolution = true,
+                Language = IronOcr.Languages.Italian.OcrLanguagePack,
+                Strategy = IronOcr.AdvancedOcr.OcrStrategy.Advanced,
+                ColorSpace = AdvancedOcr.OcrColorSpace.Color,
+                DetectWhiteTextOnDarkBackgrounds = true,
+                InputImageType = AdvancedOcr.InputTypes.AutoDetect,
+                RotateAndStraighten = true,
+                ReadBarCodes = false,
+                ColorDepth = 4
+            };
 
             this.Closing += OCRWindow_Closing;
 
@@ -1904,7 +1921,7 @@ namespace EstrattoContoOCR
         }
 
 
-        private void AnalizeArea ( SelectionArea area )
+        /*private void AnalizeArea ( SelectionArea area )
         {
             if (area == null) return;
 
@@ -1954,7 +1971,40 @@ namespace EstrattoContoOCR
             iter.Dispose();
 
             page.Dispose();
+        }*/
+
+        private void AnalizeArea(SelectionArea area)
+        {
+            if (area == null) return;
+
+            System.Drawing.Rectangle analize_area = area.GetOCRArea();
+
+            OcrResult res_area = mOcrEngine.Read(mAnalyzableImage, analize_area);
+
+            if ( res_area != null && res_area.Pages[0].Words != null && res_area.Pages[0].Words.Count() > 0 )
+            {
+                IEnumerable<OcrResult.OcrWord> words = res_area.Pages[0].Words;
+
+                foreach (OcrResult.OcrWord word in words)
+                {
+                    
+                    //modifico il rettangolo di ricerca 
+                    System.Drawing.Rectangle word_rect = new System.Drawing.Rectangle();
+                    word_rect.X = word.Location.Location.X + analize_area.X;
+                    word_rect.Y = word.Location.Location.Y + analize_area.Y;
+                    word_rect.Width = word.Location.Width;
+                    word_rect.Height = word.Location.Height;
+                   
+
+                    area.AddRecognizedArea(word_rect, word.Text, (float)word.Confidence);
+
+                }
+            }
+
         }
+
+
+
 
         private void mAddAreaMenu_Click(object sender, EventArgs args)
         {
@@ -1972,10 +2022,11 @@ namespace EstrattoContoOCR
             }*/
 
             MenuItem item = sender as MenuItem;
-
+            
             SelectionAreaType type = (SelectionAreaType)item.Tag;
 
-            Point pt = Mouse.GetPosition(mImageCanvas);
+            //Point pt = Mouse.GetPosition(mImageCanvas);
+            Point pt = new Point(0, 0);
 
             SelectionArea area = new SelectionArea(pt.X, pt.Y, 100, 100, type, this);
             area.AddToCanvas(mImageCanvas);

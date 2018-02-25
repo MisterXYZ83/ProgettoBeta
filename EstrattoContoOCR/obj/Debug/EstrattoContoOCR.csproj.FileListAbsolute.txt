@@ -171,3 +171,8 @@ C:\Users\Marco\Documents\Visual Studio 2013\Projects\ProgettoBeta\EstrattoContoO
 C:\Users\Marco\Documents\Visual Studio 2013\Projects\ProgettoBeta\EstrattoContoOCR\obj\Debug\EstrattoContoOCR.g.resources
 C:\Users\Marco\Documents\Visual Studio 2013\Projects\ProgettoBeta\EstrattoContoOCR\obj\Debug\EstrattoContoOCR.Properties.Resources.resources
 C:\Users\Marco\Documents\Visual Studio 2013\Projects\ProgettoBeta\EstrattoContoOCR\obj\Debug\EstrattoContoOCR.csproj.GenerateResource.Cache
+C:\Users\marco\Documents\GitHub\ProgettoBeta\EstrattoContoOCR\obj\Debug\EstrattoContoOCR.csproj.CoreCompileInputs.cache
+C:\Users\marco\Documents\GitHub\ProgettoBeta\EstrattoContoOCR\bin\Debug\IronOcr.dll
+C:\Users\marco\Documents\GitHub\ProgettoBeta\EstrattoContoOCR\bin\Debug\IronOcr.Italian.dll
+C:\Users\marco\Documents\GitHub\ProgettoBeta\EstrattoContoOCR\bin\Debug\IronOcr.xml
+C:\Users\marco\Documents\GitHub\ProgettoBeta\EstrattoContoOCR\bin\Debug\IronOcr.Italian.xml

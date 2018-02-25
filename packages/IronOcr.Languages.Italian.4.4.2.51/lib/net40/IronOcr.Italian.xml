@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>IronOcr.Italian</name>
+    </assembly>
+    <members>
+        <member name="T:IronOcr.Languages.Italian">
+            <summary>
+              Italian (Italiano) Language Pack for IronOcr.  
+              <para> Requires IronOcr to be of value http://ironsoftware.com/csharp/ocr/ </para>
+              <example><code>IronOcr.Language = IronOcr.Languages.Italian.OcrLanguagePack</code></example>
+            </summary>
+        </member>
+        <member name="P:IronOcr.Languages.Italian.LanguageCode">
+            <exclude />
+        </member>
+        <member name="M:IronOcr.Languages.Italian.Deploy(System.String)">
+            <exclude />
+        </member>
+        <member name="M:IronOcr.Languages.Italian.ToString">
+            <exclude />
+        </member>
+        <member name="P:IronOcr.Languages.Italian.OcrLanguagePack">
+            Italian (ita) Language pack for IronOcr
+        </member>
+    </members>
+</doc>

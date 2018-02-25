@@ -62,7 +62,7 @@ namespace EstrattoContoOCR
             }
         }
 
-        public RecognizedArea ( SelectionArea parea, Tesseract.Rect rct, string text, float conf )
+        public RecognizedArea ( SelectionArea parea, System.Drawing.Rectangle rct, string text, float conf )
         {
             mParentArea = parea;
 
@@ -82,7 +82,8 @@ namespace EstrattoContoOCR
             mShapeArea.Fill = mUnselectedColorFill;
             mShapeArea.StrokeThickness = 2;
 
-            mAreaRect = new Tesseract.Rect(rct.X1, rct.Y1, rct.Width, rct.Height);
+            //mAreaRect = new Tesseract.Rect(rct.X1, rct.Y1, rct.Width, rct.Height);
+            mAreaRect = new Tesseract.Rect(rct.X, rct.Y, rct.Width, rct.Height);
             mText = String.Copy(text);
 
             mOptionsMenu = new ContextMenu();

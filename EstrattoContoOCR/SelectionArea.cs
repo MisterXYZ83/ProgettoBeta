@@ -8,8 +8,6 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Input;
 
-using Tesseract;
-
 namespace EstrattoContoOCR
 {
 
@@ -58,7 +56,8 @@ namespace EstrattoContoOCR
 
         private SelectionAreaType mAreaType;
 
-        public static double BORDER_SIZE = 5;
+        public static double BORDER_SIZE = 2;
+        public static double ANGLE_SIZE = 5;
 
         private TextBlock mAreaInfos;
         private bool mAreaVisible;
@@ -564,7 +563,7 @@ namespace EstrattoContoOCR
 
         }
 
-        public RecognizedArea AddRecognizedArea ( Tesseract.Rect rct, string data_rec, float conf )
+        public RecognizedArea AddRecognizedArea ( System.Drawing.Rectangle rct, string data_rec, float conf )
         {
             RecognizedArea ret = null;
 
@@ -593,7 +592,7 @@ namespace EstrattoContoOCR
             return ret;
         }
 
-        public Tesseract.Rect GetOCRArea ()
+        /*public Tesseract.Rect GetOCRArea ()
         {
 
             int top = Convert.ToInt32(tl.GetValue(Canvas.TopProperty)) + (int)BORDER_SIZE;
@@ -606,6 +605,19 @@ namespace EstrattoContoOCR
 
             return rct;
 
+        }*/
+
+        public System.Drawing.Rectangle GetOCRArea()
+        {
+            int top = Convert.ToInt32(tl.GetValue(Canvas.TopProperty)) + (int)BORDER_SIZE;
+            int left = Convert.ToInt32(tl.GetValue(Canvas.LeftProperty)) + (int)BORDER_SIZE;
+
+            int w = Convert.ToInt32(c.GetValue(Canvas.WidthProperty));
+            int h = Convert.ToInt32(c.GetValue(Canvas.HeightProperty));
+
+            System.Drawing.Rectangle rct = new System.Drawing.Rectangle(left, top, w, h);
+
+            return rct;
         }
 
         public bool StretchRectangle(Rectangle r)
