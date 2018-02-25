@@ -186,8 +186,8 @@ namespace EstrattoContoOCR
                 Language = IronOcr.Languages.Italian.OcrLanguagePack,
                 Strategy = IronOcr.AdvancedOcr.OcrStrategy.Advanced,
                 ColorSpace = AdvancedOcr.OcrColorSpace.Color,
-                DetectWhiteTextOnDarkBackgrounds = true,
-                InputImageType = AdvancedOcr.InputTypes.AutoDetect,
+                DetectWhiteTextOnDarkBackgrounds = false,
+                InputImageType = AdvancedOcr.InputTypes.Document,
                 RotateAndStraighten = true,
                 ReadBarCodes = false,
                 ColorDepth = 4
@@ -1308,7 +1308,7 @@ namespace EstrattoContoOCR
                 }
                 else break;
 
-                if (((d != null && a != null) && (d.AreaRect.Y1 < a.AreaRect.Y1)) || (d != null && a == null))
+                if (((d != null && a != null) && (d.AreaRect.Y < a.AreaRect.Y)) || (d != null && a == null))
                 {
                     //inserisco DARE
 
@@ -1324,7 +1324,7 @@ namespace EstrattoContoOCR
                     mExcelActiveWorksheet.Cells[mLastRowInserted + ad_row, 4].Value = v2;
                     mExcelActiveWorksheet.Cells[mLastRowInserted + ad_row, 4].Style.Font.Color.SetColor(System.Drawing.Color.Black);
                 }
-                else if ((d != null && a != null) && (a.AreaRect.Y1 < d.AreaRect.Y1) || (d == null && a != null))
+                else if ((d != null && a != null) && (a.AreaRect.Y < d.AreaRect.Y) || (d == null && a != null))
                 {
                     //inserisco avere
 
@@ -1394,7 +1394,7 @@ namespace EstrattoContoOCR
 
 
             //calcolo della distanza tra righe, stima...uso la colonna data operazione
-            double rowDistance = EstimateRowDistance(operaz);
+            double rowDistance = EstimateRowHeight(operaz);
 
 
             //per ogni data operazione cerco i corrispondenti
@@ -1408,12 +1408,12 @@ namespace EstrattoContoOCR
                 //centro dell'area
                 double y_op = 0.0;
 
-                y_op = (op.AreaRect.Y1 + op.AreaRect.Y2) * 0.5;
+                y_op = (op.AreaRect.Y + op.AreaRect.Y) * 0.5;
 
                 //valuta
                 foreach (RecognizedArea val in valuta)
                 {
-                    double y_val = (val.AreaRect.Y1 + val.AreaRect.Y2) * 0.5;
+                    double y_val = (val.AreaRect.Y + val.AreaRect.Y) * 0.5;
 
                     if (Math.Abs(y_val - y_op) <= rowDistance)
                     {
@@ -1433,7 +1433,7 @@ namespace EstrattoContoOCR
 
                 foreach (RecognizedArea d in dare)
                 {
-                    double y_d = (d.AreaRect.Y1 + d.AreaRect.Y2) * 0.5;
+                    double y_d = (d.AreaRect.Y + d.AreaRect.Y) * 0.5;
 
                     if (Math.Abs(y_d - y_op) <= rowDistance)
                     {
@@ -1450,7 +1450,7 @@ namespace EstrattoContoOCR
 
                 foreach (RecognizedArea a in avere)
                 {
-                    double y_a = (a.AreaRect.Y1 + a.AreaRect.Y2) * 0.5;
+                    double y_a = (a.AreaRect.Y + a.AreaRect.Y) * 0.5;
 
                     if (Math.Abs(y_a - y_op) <= rowDistance)
                     {
@@ -1471,7 +1471,7 @@ namespace EstrattoContoOCR
 
                 foreach (RecognizedArea de in descriz)
                 {
-                    double y_d = (de.AreaRect.Y1 + de.AreaRect.Y2) * 0.5;
+                    double y_d = (de.AreaRect.Y + de.AreaRect.Y) * 0.5;
 
                     if (Math.Abs(y_d - y_op) <= rowDistance)
                     {
@@ -1494,7 +1494,7 @@ namespace EstrattoContoOCR
             return results;
         }
 
-        private double EstimateRowDistance ( List<RecognizedArea> area )
+        /*private double EstimateRowDistance ( List<RecognizedArea> area )
         {
             double rowdist = 20.0; //valore di default
 
@@ -1513,6 +1513,25 @@ namespace EstrattoContoOCR
             rowdist = medium;
 
             return rowdist;
+        }*/
+
+        private double EstimateRowHeight(List<RecognizedArea> areas)
+        {
+            //stimo la distanza tra righe
+            //prima estrapolo la distanza tra righe
+            //hp: le aree sono gia in ordine
+
+            double dist = 2000;
+            
+            for ( int k = 1; k < areas.Count-1; k++ )
+            {
+                double act_dist = areas[k].AreaRect.Y - areas[k - 1].AreaRect.Y;
+
+                if (act_dist < dist) dist = act_dist;
+            }
+
+            return dist;
+            
         }
 
         private int MergeResult (List<SelectionArea> areas, List<RecognizedArea> list)

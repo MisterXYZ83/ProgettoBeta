@@ -16,7 +16,7 @@ namespace EstrattoContoOCR
     public class RecognizedArea
     {
 
-        private Tesseract.Rect mAreaRect;
+        private System.Drawing.Rectangle mAreaRect;
         private string mText;
 
         private Rectangle mShapeArea;
@@ -45,7 +45,7 @@ namespace EstrattoContoOCR
             }
         }
 
-        public Tesseract.Rect AreaRect
+        public System.Drawing.Rectangle AreaRect
         {
             get { return mAreaRect; }
         }
@@ -83,7 +83,7 @@ namespace EstrattoContoOCR
             mShapeArea.StrokeThickness = 2;
 
             //mAreaRect = new Tesseract.Rect(rct.X1, rct.Y1, rct.Width, rct.Height);
-            mAreaRect = new Tesseract.Rect(rct.X, rct.Y, rct.Width, rct.Height);
+            mAreaRect = new System.Drawing.Rectangle(rct.X, rct.Y, rct.Width, rct.Height);
             mText = String.Copy(text);
 
             mOptionsMenu = new ContextMenu();
@@ -187,8 +187,8 @@ namespace EstrattoContoOCR
 
                 mParentCanvas.Children.Add(mShapeArea);
 
-                mShapeArea.SetValue(Canvas.LeftProperty, Convert.ToDouble(mAreaRect.X1));
-                mShapeArea.SetValue(Canvas.TopProperty, Convert.ToDouble(mAreaRect.Y1));
+                mShapeArea.SetValue(Canvas.LeftProperty, Convert.ToDouble(mAreaRect.X));
+                mShapeArea.SetValue(Canvas.TopProperty, Convert.ToDouble(mAreaRect.Y));
                 mShapeArea.SetValue(Canvas.WidthProperty, Convert.ToDouble(mAreaRect.Width));
                 mShapeArea.SetValue(Canvas.HeightProperty, Convert.ToDouble(mAreaRect.Height));
             }

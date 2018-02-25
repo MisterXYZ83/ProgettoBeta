@@ -41,8 +41,8 @@ namespace EstrattoContoOCR
             RecognizedArea x0 = x_data[0];
             RecognizedArea y0 = y_data[0];
 
-            if (x0.AreaRect.Y1 < y0.AreaRect.Y1) return -1;
-            else if (x0.AreaRect.Y1 == y0.AreaRect.Y1) return 0;
+            if (x0.AreaRect.Y < y0.AreaRect.Y) return -1;
+            else if (x0.AreaRect.Y == y0.AreaRect.Y) return 0;
             else return 1; //(x0.AreaRect.Y1 > y0.AreaRect.Y1) return 1;
 
         }
