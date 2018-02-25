@@ -738,7 +738,7 @@ namespace EstrattoContoOCR
                     dbox.Owner = (Window)this.Parent;
                     dbox.ShowDialog();
 
-                    mAnalyzableImage = orig.MedianFilter(3, 0, true);
+                    mAnalyzableImage = orig.FilterImage(3, 0, true, false);
 
                     dbox.Close();
 
@@ -790,7 +790,7 @@ namespace EstrattoContoOCR
                     dbox.Show();
 
 
-                    mAnalyzableImage = mAnalyzableImage.MedianFilter(3, 0, true);
+                    mAnalyzableImage = mAnalyzableImage.FilterImage(3, 0, true, false);
 
                     dbox.Close();
                     
@@ -1991,7 +1991,7 @@ namespace EstrattoContoOCR
                     //modifico il rettangolo di ricerca 
                     System.Drawing.Rectangle word_rect = new System.Drawing.Rectangle();
                     word_rect.X = word.Location.Location.X + analize_area.X;
-                    word_rect.Y = word.Location.Location.Y + analize_area.Y;
+                    word_rect.Y = word.Location.Location.Y + analize_area.Y - word.Location.Height/2;
                     word_rect.Width = word.Location.Width;
                     word_rect.Height = word.Location.Height;
                    

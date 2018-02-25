@@ -44,7 +44,7 @@ namespace EstrattoContoOCR
             mOcrWindow.Hide();
         }
 
-        async private void FileMenuItem_Click(object sender, RoutedEventArgs e)
+        private void FileMenuItem_Click(object sender, RoutedEventArgs e)
         {
             Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
 

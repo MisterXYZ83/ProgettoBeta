@@ -80,10 +80,10 @@ namespace EstrattoContoOCR
             return newBitmap;
         }*/
         
-        public static Bitmap MedianFilter(this Bitmap sourceBitmap, 
+        public static Bitmap FilterImage (this Bitmap sourceBitmap, 
                                                 int matrixSize,  
                                                   int bias = 0, 
-                                         bool grayscale = false) 
+                                         bool grayscale = false, bool median=true) 
         {
 
             BitmapData sourceData = 
@@ -121,64 +121,73 @@ namespace EstrattoContoOCR
                 }
             }
 
-            int filterOffset = (matrixSize - 1) / 2;
-            int calcOffset = 0;
 
-            int byteOffset = 0;
-
-            List<uint> neighbourPixels = new List<uint>();
-            byte[] middlePixel;
-
-            for (int offsetY = filterOffset; offsetY < 
-                sourceBitmap.Height - filterOffset; offsetY++)
+            if ( median )
             {
-                for (int offsetX = filterOffset; offsetX < 
-                    sourceBitmap.Width - filterOffset; offsetX++)
+                int filterOffset = (matrixSize - 1) / 2;
+                int calcOffset = 0;
+
+                int byteOffset = 0;
+
+                List<uint> neighbourPixels = new List<uint>();
+                byte[] middlePixel;
+
+                for (int offsetY = filterOffset; offsetY <
+                    sourceBitmap.Height - filterOffset; offsetY++)
                 {
-                    byteOffset = offsetY * 
-                                 sourceData.Stride + 
-                                 offsetX * 4;
-
-                    neighbourPixels.Clear();
-
-                    for (int filterY = -filterOffset; 
-                        filterY <= filterOffset; filterY++)
+                    for (int offsetX = filterOffset; offsetX <
+                        sourceBitmap.Width - filterOffset; offsetX++)
                     {
-                        for (int filterX = -filterOffset;
-                            filterX <= filterOffset; filterX++)
+                        byteOffset = offsetY *
+                                     sourceData.Stride +
+                                     offsetX * 4;
+
+                        neighbourPixels.Clear();
+
+                        for (int filterY = -filterOffset;
+                            filterY <= filterOffset; filterY++)
                         {
-
-                            calcOffset = byteOffset + 
-                                         (filterX * 4) + 
-                                         (filterY * sourceData.Stride);
-
-                            uint pixval = (uint)BitConverter.ToInt32(pixelBuffer, calcOffset);
-                            byte grey = pixelBuffer[calcOffset];
-
-                            if ( grey >= 0 && grey <= 20)
+                            for (int filterX = -filterOffset;
+                                filterX <= filterOffset; filterX++)
                             {
-                                neighbourPixels.Add(pixval);
+
+                                calcOffset = byteOffset +
+                                             (filterX * 4) +
+                                             (filterY * sourceData.Stride);
+
+                                uint pixval = (uint)BitConverter.ToInt32(pixelBuffer, calcOffset);
+                                byte grey = pixelBuffer[calcOffset];
+
+                                if (grey >= 0 && grey <= 20)
+                                {
+                                    neighbourPixels.Add(pixval);
+                                }
+                                else
+                                {
+                                    byte[] white = { 255, 255, 255, 255 };
+                                    neighbourPixels.Add((uint)BitConverter.ToInt32(white, 0));
+                                }
+
                             }
-                            else
-                            {
-                                byte [] white = {255,255,255,255};
-                                neighbourPixels.Add((uint)BitConverter.ToInt32(white,0));
-                            }
-                         
                         }
+
+                        neighbourPixels.Sort();
+
+                        middlePixel = BitConverter.GetBytes(
+                                           neighbourPixels[filterOffset]);
+
+                        resultBuffer[byteOffset] = middlePixel[0];
+                        resultBuffer[byteOffset + 1] = middlePixel[1];
+                        resultBuffer[byteOffset + 2] = middlePixel[2];
+                        resultBuffer[byteOffset + 3] = middlePixel[3];
                     }
-
-                    neighbourPixels.Sort();
-
-                    middlePixel = BitConverter.GetBytes(
-                                       neighbourPixels[filterOffset]);
-
-                    resultBuffer[byteOffset] = middlePixel[0];
-                    resultBuffer[byteOffset + 1] = middlePixel[1];
-                    resultBuffer[byteOffset + 2] = middlePixel[2];
-                    resultBuffer[byteOffset + 3] = middlePixel[3];
                 }
             }
+            else
+            {
+                Array.Copy(pixelBuffer, resultBuffer, pixelBuffer.Length);
+            }
+            
 
             Bitmap resultBitmap = new Bitmap(sourceBitmap.Width, 
                                              sourceBitmap.Height);
